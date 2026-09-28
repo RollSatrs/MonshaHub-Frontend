@@ -2,7 +2,15 @@
 import Link from "next/link"
 
 import * as React from "react"
-import { IconDashboard, IconFlame } from "@tabler/icons-react"
+import {
+  IconDashboard,
+  IconDoor,
+  IconFlame,
+  IconMassage,
+  IconPackage,
+  IconSettings,
+  IconUsers,
+} from "@tabler/icons-react"
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
 import {
@@ -17,10 +25,15 @@ import {
 import { useCurrentUser } from "@/hooks/use-current-user"
 
 /** Пункты меню по ролям. Новые разделы добавляются вместе с их страницами. */
-const NAV_BY_ROLE = {
-  OWNER: [{ title: "Главная", url: "/", icon: IconDashboard }],
-  CASHIER: [{ title: "Главная", url: "/", icon: IconDashboard }],
-}
+const MAIN_NAV = [{ title: "Главная", url: "/", icon: IconDashboard }]
+
+const OWNER_SETTINGS_NAV = [
+  { title: "Помещения", url: "/rooms", icon: IconDoor },
+  { title: "Товары", url: "/products", icon: IconPackage },
+  { title: "Услуги", url: "/services", icon: IconMassage },
+  { title: "Сотрудники", url: "/staff", icon: IconUsers },
+  { title: "Настройки", url: "/settings", icon: IconSettings },
+]
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useCurrentUser()
@@ -43,7 +56,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={NAV_BY_ROLE[user.role]} />
+        <NavMain items={MAIN_NAV} />
+        {user.role === "OWNER" && (
+          <NavMain label="Настройки бани" items={OWNER_SETTINGS_NAV} />
+        )}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />

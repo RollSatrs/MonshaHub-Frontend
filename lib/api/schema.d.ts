@@ -148,6 +148,228 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/staff/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Деактивировать / активировать кассира
+         * @description Деактивированный кассир теряет доступ сразу (действующая сессия перестаёт работать). Себя и владельца изменить нельзя.
+         */
+        patch: operations["StaffController_setActive"];
+        trace?: never;
+    };
+    "/organization": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["OrganizationController_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["OrganizationController_update"];
+        trace?: never;
+    };
+    "/rooms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Помещения (CASHIER — только активные) с активными тарифами */
+        get: operations["RoomsController_list"];
+        put?: never;
+        post: operations["RoomsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rooms/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RoomsController_get"];
+        put?: never;
+        post?: never;
+        /**
+         * Удалить помещение (техническая операция)
+         * @description Только для помещения, которое никогда не использовалось. Иначе 409 ENTITY_IN_USE — архивируйте (PATCH active=false).
+         */
+        delete: operations["RoomsController_remove"];
+        options?: never;
+        head?: never;
+        /**
+         * Изменить помещение / архивировать (active=false)
+         * @description Тип помещения изменить нельзя.
+         */
+        patch: operations["RoomsController_update"];
+        trace?: never;
+    };
+    "/tariffs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Тарифы (CASHIER — только активные) */
+        get: operations["TariffsController_list"];
+        put?: never;
+        /**
+         * Создать тариф помещения
+         * @description kind определяется по типу помещения. PRIVATE → HOURLY (без guestCategory); PUBLIC → PER_ENTRY (guestCategory обязателен). Не более одного активного тарифа на вид.
+         */
+        post: operations["TariffsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tariffs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Удалить тариф (техническая операция)
+         * @description Только для тарифа, который никогда не использовался. Иначе 409 ENTITY_IN_USE — архивируйте (PATCH active=false).
+         */
+        delete: operations["TariffsController_remove"];
+        options?: never;
+        head?: never;
+        /**
+         * Изменить тариф / архивировать (active=false)
+         * @description Смена цены не влияет на уже начатые посещения (Visit хранит snapshot тарифа).
+         */
+        patch: operations["TariffsController_update"];
+        trace?: never;
+    };
+    "/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Товары (CASHIER — только активные) */
+        get: operations["ProductsController_list"];
+        put?: never;
+        post: operations["ProductsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/products/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ProductsController_get"];
+        put?: never;
+        post?: never;
+        /**
+         * Удалить товар (техническая операция)
+         * @description Только для товара без истории движений и продаж. Иначе 409 ENTITY_IN_USE — архивируйте (PATCH active=false).
+         */
+        delete: operations["ProductsController_remove"];
+        options?: never;
+        head?: never;
+        /**
+         * Изменить товар / архивировать (active=false)
+         * @description Остаток здесь не меняется — используйте POST /products/:id/stock-movements.
+         */
+        patch: operations["ProductsController_update"];
+        trace?: never;
+    };
+    "/products/{id}/stock-movements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Журнал движений товара (новые сверху) */
+        get: operations["ProductsController_listMovements"];
+        put?: never;
+        /**
+         * Ручное движение остатка
+         * @description RESTOCK (+), WRITE_OFF (−, нужна причина), ADJUSTMENT (±, нужна причина). Остаток и запись журнала меняются атомарно; ниже нуля остаток не уйдёт (409 INSUFFICIENT_STOCK).
+         */
+        post: operations["ProductsController_addMovement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/services": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Услуги (CASHIER — только активные) */
+        get: operations["BathServicesController_list"];
+        put?: never;
+        post: operations["BathServicesController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/services/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["BathServicesController_get"];
+        put?: never;
+        post?: never;
+        /**
+         * Удалить услугу (техническая операция)
+         * @description Только для услуги, которая никогда не использовалась. Иначе 409 ENTITY_IN_USE — архивируйте (PATCH active=false).
+         */
+        delete: operations["BathServicesController_remove"];
+        options?: never;
+        head?: never;
+        /** Изменить услугу / архивировать (active=false) */
+        patch: operations["BathServicesController_update"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -159,7 +381,7 @@ export interface components {
              * @example VALIDATION_ERROR
              * @enum {string}
              */
-            code: "VALIDATION_ERROR" | "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT" | "TOO_MANY_REQUESTS" | "INTERNAL_ERROR" | "INVALID_CREDENTIALS" | "EMAIL_ALREADY_EXISTS" | "INVALID_RESET_TOKEN" | "ROOM_NOT_AVAILABLE" | "BOOKING_CONFLICT" | "INSUFFICIENT_STOCK" | "VISIT_ALREADY_COMPLETED";
+            code: "VALIDATION_ERROR" | "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT" | "TOO_MANY_REQUESTS" | "INTERNAL_ERROR" | "INVALID_CREDENTIALS" | "EMAIL_ALREADY_EXISTS" | "INVALID_RESET_TOKEN" | "DUPLICATE_NAME" | "ENTITY_IN_USE" | "TARIFF_ALREADY_EXISTS" | "TARIFF_ROOM_TYPE_MISMATCH" | "CANNOT_DEACTIVATE_SELF" | "ROOM_NOT_AVAILABLE" | "BOOKING_CONFLICT" | "INSUFFICIENT_STOCK" | "VISIT_ALREADY_COMPLETED";
             /** @example Ошибка валидации */
             message: string;
             /** @description Подробности (например, список ошибок валидации) */
@@ -213,12 +435,247 @@ export interface components {
             token: string;
             password: string;
         };
+        StaffMemberResponseDto: {
+            /** @example 1 */
+            id: number;
+            /** @example 1 */
+            organizationId: number;
+            /** @example Иван Иванов */
+            fullname: string;
+            /** @example owner@example.com */
+            email: string;
+            /** @enum {string} */
+            role: "OWNER" | "CASHIER";
+            avatar: string | null;
+            /** @description false — сотрудник деактивирован и не может войти */
+            active: boolean;
+        };
         CreateCashierDto: {
             /** @example Айгуль Касымова */
             fullname: string;
             /** @example cashier@example.com */
             email: string;
             password: string;
+        };
+        UpdateStaffDto: {
+            /** @description false — деактивировать кассира (доступ закрывается сразу), true — вернуть доступ */
+            active: boolean;
+        };
+        OrganizationResponseDto: {
+            /** @example 1 */
+            id: number;
+            /** @example Баня «Парная» */
+            name: string;
+            /**
+             * @description Валюта организации (пока не изменяется)
+             * @example KZT
+             */
+            currency: string;
+            /**
+             * @description Часовой пояс (пока не изменяется)
+             * @example Asia/Almaty
+             */
+            timezone: string;
+        };
+        UpdateOrganizationDto: {
+            /** @example Баня «Парная» */
+            name: string;
+        };
+        TariffResponseDto: {
+            /** @example 1 */
+            id: number;
+            /** @example 1 */
+            roomId: number;
+            /**
+             * @description Определяется backend по типу помещения: PRIVATE → HOURLY, PUBLIC → PER_ENTRY
+             * @enum {string}
+             */
+            kind: "HOURLY" | "PER_ENTRY";
+            /**
+             * @description Только для PER_ENTRY
+             * @enum {string|null}
+             */
+            guestCategory: "ADULT" | "CHILD" | null;
+            /** @example Почасовой */
+            name: string;
+            /**
+             * @description Цена часа (HOURLY) или одного входа (PER_ENTRY), decimal-строка
+             * @example 10000.00
+             */
+            price: string;
+            active: boolean;
+        };
+        RoomResponseDto: {
+            /** @example 1 */
+            id: number;
+            /** @example VIP №1 */
+            name: string;
+            /**
+             * @description PRIVATE — арендует клиент/группа; PUBLIC — общественный зал. Не меняется после создания.
+             * @enum {string}
+             */
+            type: "PRIVATE" | "PUBLIC";
+            /** @example 6 */
+            capacity: number;
+            /**
+             * @description Порядок отображения (меньше — раньше)
+             * @example 0
+             */
+            sortOrder: number;
+            /** @description false — помещение в архиве */
+            active: boolean;
+            /** @description Активные тарифы помещения (собраны на backend) */
+            activeTariffs: components["schemas"]["TariffResponseDto"][];
+        };
+        CreateRoomDto: {
+            /** @example VIP №1 */
+            name: string;
+            /** @enum {string} */
+            type: "PRIVATE" | "PUBLIC";
+            /** @example 6 */
+            capacity: number;
+            /**
+             * @default 0
+             * @example 0
+             */
+            sortOrder?: number;
+        };
+        UpdateRoomDto: {
+            name?: string;
+            capacity?: number;
+            sortOrder?: number;
+            /** @description false — архивировать помещение */
+            active?: boolean;
+        };
+        CreateTariffDto: {
+            /** @example 1 */
+            roomId: number;
+            /** @example Почасовой */
+            name: string;
+            /**
+             * @description Обязательно для PUBLIC-помещения, запрещено для PRIVATE
+             * @enum {string}
+             */
+            guestCategory?: "ADULT" | "CHILD";
+            /**
+             * @description Decimal-строка, до 2 знаков после точки
+             * @example 10000.00
+             */
+            price: string;
+        };
+        UpdateTariffDto: {
+            name?: string;
+            /**
+             * @description Decimal-строка, до 2 знаков после точки
+             * @example 10000.00
+             */
+            price?: string;
+            /** @description false — архивировать тариф */
+            active?: boolean;
+        };
+        ProductResponseDto: {
+            /** @example 1 */
+            id: number;
+            /** @example Веник */
+            name: string;
+            /** @example 2500.00 */
+            price: string;
+            /**
+             * @description Текущий остаток. Меняется только через stock-movements.
+             * @example 50
+             */
+            stock: number;
+            /** @description false — товар в архиве (не продаётся, история сохраняется) */
+            active: boolean;
+        };
+        CreateProductDto: {
+            /** @example Веник */
+            name: string;
+            /**
+             * @description Decimal-строка, до 2 знаков после точки
+             * @example 10000.00
+             */
+            price: string;
+            /**
+             * @description Начальный остаток; при > 0 создаётся движение RESTOCK
+             * @default 0
+             * @example 50
+             */
+            stock?: number;
+        };
+        UpdateProductDto: {
+            name?: string;
+            /**
+             * @description Decimal-строка, до 2 знаков после точки
+             * @example 10000.00
+             */
+            price?: string;
+            /** @description false — архивировать товар */
+            active?: boolean;
+        };
+        CreateStockMovementDto: {
+            /**
+             * @description SALE создаётся автоматически при добавлении товара в посещение (Phase 2)
+             * @enum {string}
+             */
+            type: "RESTOCK" | "WRITE_OFF" | "ADJUSTMENT";
+            /**
+             * @description Изменение остатка со знаком. RESTOCK > 0, WRITE_OFF < 0, ADJUSTMENT — любое ≠ 0.
+             * @example 20
+             */
+            quantityDelta: number;
+            /** @description Обязательна для WRITE_OFF и ADJUSTMENT */
+            reason?: string;
+        };
+        StockMovementResponseDto: {
+            id: number;
+            productId: number;
+            /** @enum {string} */
+            type: "RESTOCK" | "WRITE_OFF" | "ADJUSTMENT" | "SALE";
+            /** @example 20 */
+            quantityDelta: number;
+            /**
+             * @description Остаток после операции
+             * @example 70
+             */
+            balanceAfter: number;
+            reason: string | null;
+            createdBy: number;
+            createdByName: string | null;
+            createdAt: string;
+        };
+        StockMovementResultDto: {
+            movement: components["schemas"]["StockMovementResponseDto"];
+            product: components["schemas"]["ProductResponseDto"];
+        };
+        BathServiceResponseDto: {
+            /** @example 1 */
+            id: number;
+            /** @example Массаж */
+            name: string;
+            /** @example 5000.00 */
+            price: string;
+            /** @description false — услуга в архиве */
+            active: boolean;
+        };
+        CreateBathServiceDto: {
+            /** @example Массаж */
+            name: string;
+            /**
+             * @description Decimal-строка, до 2 знаков после точки
+             * @example 10000.00
+             */
+            price: string;
+        };
+        UpdateBathServiceDto: {
+            name?: string;
+            /**
+             * @description Decimal-строка, до 2 знаков после точки
+             * @example 10000.00
+             */
+            price?: string;
+            /** @description false — архивировать услугу */
+            active?: boolean;
         };
     };
     responses: never;
@@ -292,7 +749,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Устанавливает httpOnly cookie access_token */
+            /** @description Устанавливает httpOnly cookie сессии */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -349,6 +806,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Идемпотентно очищает cookie сессии (работает и с просроченным/недействительным токеном — иначе клиент не смог бы выйти из «застрявшей» сессии) */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -447,7 +905,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserResponseDto"][];
+                    "application/json": components["schemas"]["StaffMemberResponseDto"][];
                 };
             };
             /** @description Ошибка */
@@ -479,7 +937,760 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserResponseDto"];
+                    "application/json": components["schemas"]["StaffMemberResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    StaffController_setActive: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateStaffDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffMemberResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    OrganizationController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Своя организация */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizationResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    OrganizationController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateOrganizationDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizationResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    RoomsController_list: {
+        parameters: {
+            query?: {
+                /** @description Включить архивные записи. Только для OWNER; для CASHIER параметр игнорируется (всегда только активные). */
+                includeInactive?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoomResponseDto"][];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    RoomsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateRoomDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoomResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    RoomsController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoomResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    RoomsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    RoomsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateRoomDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoomResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    TariffsController_list: {
+        parameters: {
+            query?: {
+                /** @description Включить архивные записи. Только для OWNER; для CASHIER параметр игнорируется (всегда только активные). */
+                includeInactive?: boolean;
+                /** @description Только тарифы этого помещения */
+                roomId?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TariffResponseDto"][];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    TariffsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTariffDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TariffResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    TariffsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    TariffsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTariffDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TariffResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ProductsController_list: {
+        parameters: {
+            query?: {
+                /** @description Включить архивные записи. Только для OWNER; для CASHIER параметр игнорируется (всегда только активные). */
+                includeInactive?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductResponseDto"][];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ProductsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateProductDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ProductsController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ProductsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ProductsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProductDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ProductsController_listMovements: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockMovementResponseDto"][];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    ProductsController_addMovement: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateStockMovementDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockMovementResultDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    BathServicesController_list: {
+        parameters: {
+            query?: {
+                /** @description Включить архивные записи. Только для OWNER; для CASHIER параметр игнорируется (всегда только активные). */
+                includeInactive?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BathServiceResponseDto"][];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    BathServicesController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateBathServiceDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BathServiceResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    BathServicesController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BathServiceResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    BathServicesController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    BathServicesController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateBathServiceDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BathServiceResponseDto"];
                 };
             };
             /** @description Ошибка */
