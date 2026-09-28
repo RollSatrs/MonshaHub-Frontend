@@ -1,4 +1,4 @@
-import Image from "next/image"
+import { AuthBrandPanel } from "@/components/auth-brand-panel"
 import { ForgotPasswordForm } from "@/components/forgot-password-form"
 
 export default function ForgotPasswordPage() {
@@ -11,14 +11,7 @@ export default function ForgotPasswordPage() {
           </div>
         </div>
       </div>
-      <div className="bg-muted relative hidden lg:block">
-        <Image
-          src="/placeholder.svg"
-          alt="Image"
-          fill
-          className="object-cover dark:brightness-[0.2] dark:grayscale"
-        />
-      </div>
+      <AuthBrandPanel />
     </div>
   )
 }

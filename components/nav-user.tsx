@@ -1,22 +1,13 @@
 "use client"
 
-import {
-  IconCreditCard,
-  IconDotsVertical,
-  IconLogout,
-  IconNotification,
-  IconUserCircle,
-} from "@tabler/icons-react"
+import { IconDotsVertical, IconLogout } from "@tabler/icons-react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -29,28 +20,47 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { api } from "@/lib/api"
-import { useRouter } from "next/navigation"
-import { IUser } from "@/shared/interface/user.interface"
-import { toast } from "sonner"
+import type { User } from "@/lib/api/types"
 
-export function NavUser({ user }: { user: IUser }) {
+function initials(fullname: string) {
+  return fullname
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]!.toUpperCase())
+    .join("")
+}
+
+export function NavUser({ user }: { user: User }) {
   const { isMobile } = useSidebar()
   const router = useRouter()
 
   async function handleLogout() {
-    toast.promise(
-      await api.post("/auth/logout"),
-      {
-        loading: "Выход из аккаунта...",
-        success: () =>{
-          router.push("login")
-          return "Вы вышли из аккаунта"
-        },
-        error: "Упсс, ошибка при выходе"
-      }
-    )
-    router.push("/login")
+    try {
+      await api.post("/auth/logout")
+      toast.success("Вы вышли из аккаунта")
+      router.push("/login")
+    } catch {
+      toast.error("Не удалось выйти, попробуйте ещё раз")
+    }
   }
+
+  const identity = (
+    <>
+      <Avatar className="h-8 w-8 rounded-lg">
+        <AvatarImage src={user.avatar ?? ""} alt={user.fullname} />
+        <AvatarFallback className="rounded-lg">
+          {initials(user.fullname)}
+        </AvatarFallback>
+      </Avatar>
+      <div className="grid flex-1 text-left text-sm leading-tight">
+        <span className="truncate font-medium">{user.fullname}</span>
+        <span className="text-muted-foreground truncate text-xs">
+          {user.email}
+        </span>
+      </div>
+    </>
+  )
 
   return (
     <SidebarMenu>
@@ -61,16 +71,7 @@ export function NavUser({ user }: { user: IUser }) {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg grayscale">
-                <AvatarImage src={user.avatar ?? ""} alt={user.fullname} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-              </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.fullname }</span>
-                <span className="text-muted-foreground truncate text-xs">
-                  {user.email}
-                </span>
-              </div>
+              {identity}
               <IconDotsVertical className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
@@ -82,37 +83,13 @@ export function NavUser({ user }: { user: IUser }) {
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar ?? ""} alt={user.fullname} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-                </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.fullname}</span>
-                  <span className="text-muted-foreground truncate text-xs">
-                    {user.email}
-                  </span>
-                </div>
+                {identity}
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <IconUserCircle />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconCreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconNotification />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <IconLogout />
-              Log out
+              Выйти
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

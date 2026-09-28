@@ -105,7 +105,7 @@ export function LoginForm({
         >
           <div
             className={cn(
-              "flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-2 py-1 text-xs text-red-700",
+              "flex items-center gap-2 rounded-md border border-danger/30 bg-danger-subtle px-2 py-1 text-xs text-danger",
               error && "animate-shake"
             )}
           >
@@ -133,7 +133,7 @@ export function LoginForm({
           </Button> */}
           <FieldDescription className="text-center">
             Нет аккаунта?{" "}
-            <a href="signup" className="underline underline-offset-4">
+            <a href="/signup" className="underline underline-offset-4">
               Создать
             </a>
           </FieldDescription>

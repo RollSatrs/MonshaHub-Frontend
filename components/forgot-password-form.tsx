@@ -89,7 +89,7 @@ export function ForgotPasswordForm({
             error ? "max-h-16 opacity-100 mt-1" : "max-h-0 opacity-0 mt-0"
           )}
         >
-          <div className="flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-2 py-1 text-xs text-red-700">
+          <div className="flex items-center gap-2 rounded-md border border-danger/30 bg-danger-subtle px-2 py-1 text-xs text-danger">
             <span className="leading-none">⚠️</span>
             <span className="leading-tight">{error}</span>
           </div>

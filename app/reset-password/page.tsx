@@ -1,5 +1,5 @@
+import { AuthBrandPanel } from "@/components/auth-brand-panel"
 import { Suspense } from "react"
-import Image from "next/image"
 import { ResetPasswordForm } from "@/components/reset-password-form"
 
 export default function ResetPasswordPage() {
@@ -14,14 +14,7 @@ export default function ResetPasswordPage() {
           </div>
         </div>
       </div>
-      <div className="bg-muted relative hidden lg:block">
-        <Image
-          src="/placeholder.svg"
-          alt="Image"
-          fill
-          className="object-cover dark:brightness-[0.2] dark:grayscale"
-        />
-      </div>
+      <AuthBrandPanel />
     </div>
   )
 }

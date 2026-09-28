@@ -1,1 +1,0 @@
-export type Role = "teacher" | "student" | "schoolkid"

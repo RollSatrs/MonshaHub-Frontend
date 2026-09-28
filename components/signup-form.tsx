@@ -14,9 +14,7 @@ import { api } from "@/lib/api"
 import { getErrorMessage } from "@/lib/get-error-message"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { ButtonGroup } from "./ui/button-group"
 import { Spinner } from "./ui/spinner"
-import { Role } from "@/shared/interface/role.interface"
 
 export function SignupForm({
   className,
@@ -26,7 +24,7 @@ export function SignupForm({
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [role, setRole] = useState<Role>("student")
+  const [organizationName, setOrganizationName] = useState("")
 
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
@@ -59,13 +57,13 @@ export function SignupForm({
     }
 
     try {
-      await api.post("/auth/register", { fullname, email, password, role })
+      await api.post("/auth/register", {
+        organizationName,
+        fullname,
+        email,
+        password,
+      })
       router.push("/login")
-      // setFullName("")
-      // setEmail("")
-      // setPassword("")
-      // setConfirmPassword("")
-      // setRole("student")
     } catch (err) {
       console.error(err)
       setError(getErrorMessage(err))
@@ -82,35 +80,28 @@ export function SignupForm({
     >
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-bold">Создать аккаунт</h1>
+          <h1 className="text-2xl font-bold">Регистрация бани</h1>
           <p className={sizes.minitwo}>
-            Заполните форму ниже, чтобы создать аккаунт
+            Создайте аккаунт владельца. Кассиров вы добавите позже.
           </p>
         </div>
-        <div className="flex justify-center">
-          <ButtonGroup>
-            <Button
-              onClick={() => setRole("student")}
-              variant={role === "student" ? "default" : "outline"}
-              type="button"
-            >
-              Студент
-            </Button>
-            <Button
-              onClick={() => setRole("schoolkid")}
-              variant={role === "schoolkid" ? "default" : "outline"}
-              type="button"
-            >
-              Школьник
-            </Button>
-          </ButtonGroup>
-        </div>
         <Field>
-          <FieldLabel htmlFor="name">Полное имя</FieldLabel>
+          <FieldLabel htmlFor="organization">Название бани</FieldLabel>
+          <Input
+            id="organization"
+            type="text"
+            placeholder="Баня «Парная»"
+            value={organizationName}
+            onChange={(e) => setOrganizationName(e.target.value)}
+            required
+          />
+        </Field>
+        <Field>
+          <FieldLabel htmlFor="name">Ваше имя</FieldLabel>
           <Input
             id="name"
             type="text"
-            placeholder="Роллан"
+            placeholder="Иван Иванов"
             value={fullname}
             onChange={(e) => setFullName(e.target.value)}
             required
@@ -127,10 +118,6 @@ export function SignupForm({
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-          <FieldDescription className={sizes.mini}>
-            Мы будем использовать этот email для связи с вами. Ваш email никто
-            не увидит.
-          </FieldDescription>
         </Field>
 
         <Field>
@@ -171,7 +158,7 @@ export function SignupForm({
         >
           <div
             className={cn(
-              "flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-2 py-1 text-xs text-red-700",
+              "flex items-center gap-2 rounded-md border border-danger/30 bg-danger-subtle px-2 py-1 text-xs text-danger",
               error && "animate-shake"
             )}
           >
@@ -186,7 +173,7 @@ export function SignupForm({
             {loading ? <Spinner className="size-6" /> : ""}
           </Button>
           <FieldDescription className="px-6 text-center">
-            Уже есть аккаунт? <a href="login">Войти</a>
+            Уже есть аккаунт? <a href="/login">Войти</a>
           </FieldDescription>
         </Field>
       </FieldGroup>
