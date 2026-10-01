@@ -14,8 +14,10 @@ export function useOrganization() {
 export function useUpdateOrganization() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (input: { name: string }) =>
-      (await api.patch<Organization>("/organization", input)).data,
+    mutationFn: async (input: {
+      name?: string
+      timeStepMinutes?: 15 | 30 | 60
+    }) => (await api.patch<Organization>("/organization", input)).data,
     onSuccess: (data) => qc.setQueryData(organizationKey, data),
   })
 }

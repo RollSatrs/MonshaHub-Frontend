@@ -370,6 +370,412 @@ export interface paths {
         patch: operations["BathServicesController_update"];
         trace?: never;
     };
+    "/bookings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Брони (по умолчанию — предстоящие BOOKED)
+         * @description Доступно OWNER и CASHIER.
+         */
+        get: operations["BookingsController_list"];
+        put?: never;
+        /**
+         * Создать бронь PRIVATE-помещения
+         * @description Пересечение с другой бронью или идущим посещением — 409 BOOKING_CONFLICT (в meta: время конфликта).
+         */
+        post: operations["BookingsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bookings/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Изменить/перенести бронь (только BOOKED) */
+        patch: operations["BookingsController_update"];
+        trace?: never;
+    };
+    "/bookings/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Отменить бронь */
+        post: operations["BookingsController_cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bookings/{id}/no-show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Отметить неявку */
+        post: operations["BookingsController_noShow"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bookings/{id}/start-visit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Начать посещение по брони
+         * @description Посещение стартует «сейчас» на длительность брони (или указанную). Пересечение со следующей бронью — 409 BOOKING_CONFLICT.
+         */
+        post: operations["BookingsController_startVisit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/visits/private": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Начать посещение PRIVATE-помещения (walk-in)
+         * @description Оплачиваемая длительность фиксируется сразу (кратна шагу организации). Ошибки: ROOM_NOT_AVAILABLE (занято/на уборке), BOOKING_CONFLICT (пересечение с бронью), TARIFF_NOT_CONFIGURED.
+         */
+        post: operations["VisitsController_startPrivate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/visits/public": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Вход в общественный зал: новый чек человека/группы
+         * @description Создаёт посещение с позициями входа (цена — snapshot тарифа). Ошибки: ROOM_CAPACITY_EXCEEDED, TARIFF_NOT_CONFIGURED.
+         */
+        post: operations["VisitsController_startPublic"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/visits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * История посещений
+         * @description CASHIER — только последние 24 часа, OWNER — вся история организации.
+         */
+        get: operations["VisitsController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/visits/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Посещение: позиции, платежи, итог, оплачено, остаток */
+        get: operations["VisitsController_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/visits/{id}/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Добавить товар
+         * @description Одной транзакцией: позиция + уменьшение остатка + движение SALE. INSUFFICIENT_STOCK откатывает всё.
+         */
+        post: operations["VisitsController_addProduct"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/visits/{id}/services": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Добавить услугу (без складского движения) */
+        post: operations["VisitsController_addService"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/visits/{id}/guests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Добавить гостей в чек общественного зала
+         * @description Проверяет вместимость: ROOM_CAPACITY_EXCEEDED.
+         */
+        post: operations["VisitsController_addGuests"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/visits/{id}/extend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Продлить PRIVATE-посещение
+         * @description На целое число шагов. Продление считается от прежнего конца (при просрочке — задним числом). Пересечение со следующей бронью — 409 BOOKING_CONFLICT (meta.availableMinutes).
+         */
+        post: operations["VisitsController_extend"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/visits/{id}/items/{itemId}/void": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Убрать ошибочную позицию
+         * @description Позиция не удаляется: сохраняются кто, когда и причина. Товар возвращается на склад (SALE_RETURN). Время помещения убрать нельзя. Оплаченную позицию — нельзя (ITEM_ALREADY_PAID).
+         */
+        post: operations["VisitsController_voidItem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/visits/{id}/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Принять платёж
+         * @description Можно несколько платежей (разные методы). Сумма не больше остатка: PAYMENT_EXCEEDS_BALANCE.
+         */
+        post: operations["VisitsController_addPayment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/visits/{id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Завершить посещение (выход)
+         * @description Только при полной оплате. Платежи из тела применяются в той же транзакции; если оплата не покрывает итог — 409 VISIT_NOT_PAID и ничего не сохраняется. PRIVATE после завершения переходит на уборку.
+         */
+        post: operations["VisitsController_complete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/visits/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Отменить посещение, начатое по ошибке
+         * @description Только пока нет платежей (VISIT_HAS_PAYMENTS). Товары возвращаются на склад. Сохраняются кто, когда и причина.
+         */
+        post: operations["VisitsController_cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rooms/{id}/finish-cleaning": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Уборка завершена: помещение снова свободно
+         * @description CLEANING_NOT_ACTIVE, если помещение не на уборке.
+         */
+        post: operations["RoomOpsController_finishCleaning"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rooms/{id}/inside": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** «Внутри сейчас» — активные чеки общественного зала */
+        get: operations["RoomOpsController_inside"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rooms/{id}/complete-paid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Завершить все оплаченные посещения общественного зала
+         * @description Массово завершает активные чеки зала, у которых оплачено = итог. Остальные не затрагиваются.
+         */
+        post: operations["RoomOpsController_completePaid"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/live/board": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * «Баня сейчас»: состояние всех помещений
+         * @description Состояние (AVAILABLE, OCCUPIED, ENDING_SOON, OVERTIME, CLEANING, OPEN, FULL) вычисляет backend. Frontend отсчитывает время от endsAt и serverTime и периодически перезапрашивает.
+         */
+        get: operations["LiveController_board"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -381,11 +787,15 @@ export interface components {
              * @example VALIDATION_ERROR
              * @enum {string}
              */
-            code: "VALIDATION_ERROR" | "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT" | "TOO_MANY_REQUESTS" | "INTERNAL_ERROR" | "INVALID_CREDENTIALS" | "EMAIL_ALREADY_EXISTS" | "INVALID_RESET_TOKEN" | "DUPLICATE_NAME" | "ENTITY_IN_USE" | "TARIFF_ALREADY_EXISTS" | "TARIFF_ROOM_TYPE_MISMATCH" | "CANNOT_DEACTIVATE_SELF" | "ROOM_NOT_AVAILABLE" | "BOOKING_CONFLICT" | "INSUFFICIENT_STOCK" | "VISIT_ALREADY_COMPLETED";
+            code: "VALIDATION_ERROR" | "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT" | "TOO_MANY_REQUESTS" | "INTERNAL_ERROR" | "INVALID_CREDENTIALS" | "EMAIL_ALREADY_EXISTS" | "INVALID_RESET_TOKEN" | "DUPLICATE_NAME" | "ENTITY_IN_USE" | "TARIFF_ALREADY_EXISTS" | "TARIFF_ROOM_TYPE_MISMATCH" | "CANNOT_DEACTIVATE_SELF" | "TARIFF_NOT_CONFIGURED" | "ROOM_TYPE_MISMATCH" | "ROOM_CAPACITY_EXCEEDED" | "VISIT_NOT_ACTIVE" | "VISIT_NOT_PAID" | "VISIT_HAS_PAYMENTS" | "PAYMENT_EXCEEDS_BALANCE" | "ITEM_ALREADY_PAID" | "ITEM_NOT_VOIDABLE" | "BOOKING_NOT_ACTIVE" | "CLEANING_NOT_ACTIVE" | "PRODUCT_NOT_AVAILABLE" | "SERVICE_NOT_AVAILABLE" | "ROOM_NOT_AVAILABLE" | "BOOKING_CONFLICT" | "INSUFFICIENT_STOCK" | "VISIT_ALREADY_COMPLETED";
             /** @example Ошибка валидации */
             message: string;
             /** @description Подробности (например, список ошибок валидации) */
             details?: string[];
+            /** @description Структурированные подробности ошибки (например, время ближайшей брони при BOOKING_CONFLICT) */
+            meta?: {
+                [key: string]: unknown;
+            };
             /** @example /auth/login */
             path: string;
             timestamp: string;
@@ -476,10 +886,21 @@ export interface components {
              * @example Asia/Almaty
              */
             timezone: string;
+            /**
+             * @description Шаг оплачиваемого времени PRIVATE-посещения (мин): длительность старта и продления кратны шагу. Применяется к новым посещениям.
+             * @example 60
+             * @enum {number}
+             */
+            timeStepMinutes: 15 | 30 | 60;
         };
         UpdateOrganizationDto: {
             /** @example Баня «Парная» */
-            name: string;
+            name?: string;
+            /**
+             * @description Шаг времени: 15, 30 или 60 минут
+             * @enum {number}
+             */
+            timeStepMinutes?: 15 | 30 | 60;
         };
         TariffResponseDto: {
             /** @example 1 */
@@ -631,7 +1052,7 @@ export interface components {
             id: number;
             productId: number;
             /** @enum {string} */
-            type: "RESTOCK" | "WRITE_OFF" | "ADJUSTMENT" | "SALE";
+            type: "RESTOCK" | "WRITE_OFF" | "ADJUSTMENT" | "SALE" | "SALE_RETURN";
             /** @example 20 */
             quantityDelta: number;
             /**
@@ -676,6 +1097,340 @@ export interface components {
             price?: string;
             /** @description false — архивировать услугу */
             active?: boolean;
+        };
+        BookingResponseDto: {
+            id: number;
+            roomId: number;
+            roomName: string;
+            customerName: string;
+            customerPhone: string;
+            /** @description ISO-время начала */
+            startsAt: string;
+            /** @description ISO-время окончания */
+            endsAt: string;
+            /** @description Длительность в минутах (endsAt − startsAt) */
+            durationMinutes: number;
+            /** @enum {string} */
+            status: "BOOKED" | "STARTED" | "CANCELLED" | "NO_SHOW";
+            notes: string | null;
+            createdByName: string | null;
+            /** @description true — бронь ещё не начата, но её время уже наступило */
+            isLate: boolean;
+            /** @description Посещение, начатое по этой брони */
+            visitId: number | null;
+            closedAt: string | null;
+            closeReason: string | null;
+        };
+        CreateBookingDto: {
+            roomId: number;
+            customerName: string;
+            /** @example +7 701 123 45 67 */
+            customerPhone: string;
+            /**
+             * @description Начало брони (ISO 8601 с часовым поясом)
+             * @example 2026-01-01T18:00:00+05:00
+             */
+            startsAt: string;
+            /**
+             * @description Длительность в минутах, кратна шагу организации
+             * @example 120
+             */
+            durationMinutes: number;
+            notes?: string;
+        };
+        UpdateBookingDto: {
+            customerName?: string;
+            customerPhone?: string;
+            startsAt?: string;
+            durationMinutes?: number;
+            notes?: string;
+        };
+        CloseBookingDto: {
+            reason?: string;
+        };
+        StartBookingVisitDto: {
+            /** @description Оплачиваемая длительность. По умолчанию — длительность брони. Кратна шагу организации. */
+            durationMinutes?: number;
+        };
+        VisitItemDto: {
+            id: number;
+            /** @enum {string} */
+            kind: "ROOM_TIME" | "ENTRY" | "PRODUCT" | "SERVICE";
+            /** @description Название на момент добавления (snapshot) */
+            name: string;
+            /**
+             * @description Цена на момент добавления (snapshot)
+             * @example 2500.00
+             */
+            unitPrice: string;
+            quantity: number;
+            /** @description ROOM_TIME: оплаченные минуты */
+            minutes: number | null;
+            /** @enum {string|null} */
+            guestCategory: "ADULT" | "CHILD" | null;
+            /**
+             * @description Сумма позиции (считает backend)
+             * @example 5000.00
+             */
+            lineTotal: string;
+            /** @description true — позиция убрана (в итог не входит) */
+            voided: boolean;
+            voidedAt: string | null;
+            voidedByName: string | null;
+            voidReason: string | null;
+            createdAt: string;
+            createdByName: string | null;
+        };
+        PaymentDto: {
+            id: number;
+            /** @example 10000.00 */
+            amount: string;
+            /** @enum {string} */
+            method: "CASH" | "CARD" | "KASPI" | "OTHER";
+            createdAt: string;
+            createdByName: string | null;
+        };
+        VisitDetailDto: {
+            id: number;
+            /** @enum {string} */
+            kind: "PRIVATE" | "PUBLIC";
+            /** @enum {string} */
+            status: "ACTIVE" | "COMPLETED" | "CANCELLED";
+            roomId: number;
+            /** @description Название помещения на момент старта (snapshot) */
+            roomName: string;
+            bookingId: number | null;
+            customerName: string | null;
+            customerPhone: string | null;
+            guestsCount: number | null;
+            startedAt: string;
+            /** @description PRIVATE: оплаченный конец времени */
+            endsAt: string | null;
+            /** @description Фактическое завершение */
+            endedAt: string | null;
+            /** @example KZT */
+            currency: string;
+            /** @description Шаг времени, действовавший при старте */
+            timeStepMinutes: number | null;
+            /**
+             * @description Часовая ставка на момент старта
+             * @example 10000.00
+             */
+            hourlyRate: string | null;
+            /**
+             * @description Только для ACTIVE PRIVATE, вычисляет backend
+             * @enum {string|null}
+             */
+            timeState: "OCCUPIED" | "ENDING_SOON" | "OVERTIME" | null;
+            /** @description Секунд до конца на serverTime (отрицательное — просрочка) */
+            remainingSeconds: number | null;
+            items: components["schemas"]["VisitItemDto"][];
+            payments: components["schemas"]["PaymentDto"][];
+            /**
+             * @description Итог = сумма позиций без убранных
+             * @example 31500.00
+             */
+            total: string;
+            /** @example 0.00 */
+            paid: string;
+            /**
+             * @description Осталось оплатить
+             * @example 31500.00
+             */
+            balance: string;
+            /** @enum {string} */
+            paymentStatus: "UNPAID" | "PARTIAL" | "PAID";
+            /** @description PUBLIC: сколько гостей в этом чеке */
+            guests: number | null;
+            completedByName: string | null;
+            cancelledAt: string | null;
+            cancelledByName: string | null;
+            cancelReason: string | null;
+            /** @description Время сервера — от него считать обратный отсчёт */
+            serverTime: string;
+        };
+        StartPrivateVisitDto: {
+            customerName?: string;
+            /** @example +7 701 123 45 67 */
+            customerPhone?: string;
+            roomId: number;
+            /**
+             * @description Оплачиваемая длительность, минут. Кратна шагу организации (15/30/60).
+             * @example 120
+             */
+            durationMinutes: number;
+            guestsCount?: number;
+        };
+        GuestDto: {
+            /** @enum {string} */
+            category: "ADULT" | "CHILD";
+            /** @example 2 */
+            quantity: number;
+        };
+        StartPublicVisitDto: {
+            customerName?: string;
+            /** @example +7 701 123 45 67 */
+            customerPhone?: string;
+            roomId: number;
+            /** @description Кто входит: например 2 взрослых и 1 ребёнок */
+            guests: components["schemas"]["GuestDto"][];
+        };
+        VisitSummaryDto: {
+            id: number;
+            /** @enum {string} */
+            kind: "PRIVATE" | "PUBLIC";
+            /** @enum {string} */
+            status: "ACTIVE" | "COMPLETED" | "CANCELLED";
+            roomName: string;
+            customerName: string | null;
+            startedAt: string;
+            endedAt: string | null;
+            cancelledAt: string | null;
+            /** @example 31500.00 */
+            total: string;
+            /** @example 31500.00 */
+            paid: string;
+            /** @description Сколько позиций было убрано (OWNER видит подробности в посещении) */
+            voidedItemsCount: number;
+            guests: number | null;
+            cancelReason: string | null;
+        };
+        VisitListDto: {
+            items: components["schemas"]["VisitSummaryDto"][];
+            hasMore: boolean;
+        };
+        AddProductDto: {
+            productId: number;
+            /** @default 1 */
+            quantity: number;
+        };
+        AddServiceDto: {
+            serviceId: number;
+            /** @default 1 */
+            quantity: number;
+        };
+        AddGuestsDto: {
+            guests: components["schemas"]["GuestDto"][];
+        };
+        ExtendVisitDto: {
+            /**
+             * @description На сколько минут продлить; кратно шагу посещения
+             * @example 60
+             */
+            minutes: number;
+        };
+        VoidItemDto: {
+            /** @example Добавили по ошибке */
+            reason: string;
+        };
+        CreatePaymentDto: {
+            /** @enum {string} */
+            method: "CASH" | "CARD" | "KASPI" | "OTHER";
+            /**
+             * @description Сумма платежа, не больше остатка к оплате
+             * @example 10000.00
+             */
+            amount: string;
+        };
+        CompleteVisitDto: {
+            /** @description Платежи, применяемые в той же транзакции. Если после них оплата не покрывает итог — ничего не сохраняется (409 VISIT_NOT_PAID). */
+            payments?: components["schemas"]["CreatePaymentDto"][];
+        };
+        CancelVisitDto: {
+            /** @example Начали не в том помещении */
+            reason: string;
+        };
+        CleaningFinishedDto: {
+            finished: boolean;
+        };
+        InsideVisitDto: {
+            visitId: number;
+            customerName: string | null;
+            adults: number;
+            children: number;
+            guests: number;
+            startedAt: string;
+            /** @example 2000.00 */
+            total: string;
+            /** @example 2000.00 */
+            paid: string;
+            /** @example 0.00 */
+            balance: string;
+            /** @enum {string} */
+            paymentStatus: "UNPAID" | "PARTIAL" | "PAID";
+        };
+        InsideDto: {
+            roomId: number;
+            roomName: string;
+            capacity: number;
+            inside: number;
+            visits: components["schemas"]["InsideVisitDto"][];
+            /** @description Serverное время */
+            serverTime: string;
+        };
+        MessageCountDto: {
+            /** @description Сколько посещений завершено */
+            completed: number;
+        };
+        LiveVisitDto: {
+            id: number;
+            customerName: string | null;
+            startedAt: string;
+            /** @description PRIVATE: оплаченный конец */
+            endsAt: string | null;
+            /** @example 31500.00 */
+            total: string;
+            /** @example 0.00 */
+            paid: string;
+            /** @example 31500.00 */
+            balance: string;
+            /** @enum {string} */
+            paymentStatus: "UNPAID" | "PARTIAL" | "PAID";
+        };
+        LiveBookingDto: {
+            id: number;
+            customerName: string;
+            startsAt: string;
+            endsAt: string;
+        };
+        LiveRoomDto: {
+            id: number;
+            name: string;
+            /** @enum {string} */
+            type: "PRIVATE" | "PUBLIC";
+            capacity: number;
+            /**
+             * @description Вычисляет backend. PRIVATE: AVAILABLE, OCCUPIED, ENDING_SOON, OVERTIME, CLEANING. PUBLIC: OPEN, FULL.
+             * @enum {string}
+             */
+            state: "AVAILABLE" | "OCCUPIED" | "ENDING_SOON" | "OVERTIME" | "CLEANING" | "OPEN" | "FULL";
+            /** @description PRIVATE: идущее посещение */
+            visit: components["schemas"]["LiveVisitDto"] | null;
+            /** @description CLEANING: когда началась уборка */
+            cleaningStartedAt: string | null;
+            /** @description Ближайшая будущая бронь (PRIVATE) */
+            nextBooking: components["schemas"]["LiveBookingDto"] | null;
+            /** @description Для AVAILABLE: сколько минут свободно до ближайшей брони (null — брони нет) */
+            availableMinutes: number | null;
+            /** @description PUBLIC: сколько человек внутри */
+            inside: number | null;
+            /** @description PUBLIC: сколько активных чеков */
+            activeVisits: number | null;
+            /** @description false — не задан нужный тариф, начать посещение нельзя */
+            hasTariff: boolean;
+        };
+        LiveBoardDto: {
+            /** @description Время сервера — от него считать обратный отсчёт */
+            serverTime: string;
+            /** @description За сколько минут до конца помещение становится ENDING_SOON */
+            endingSoonMinutes: number;
+            /** @example KZT */
+            currency: string;
+            /** @example Asia/Almaty */
+            timezone: string;
+            /** @description Шаг оплачиваемого времени (15/30/60) */
+            timeStepMinutes: number;
+            rooms: components["schemas"]["LiveRoomDto"][];
         };
     };
     responses: never;
@@ -1691,6 +2446,733 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BathServiceResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    BookingsController_list: {
+        parameters: {
+            query?: {
+                /** @description Брони, заканчивающиеся не раньше этого времени. По умолчанию — сейчас. */
+                from?: string;
+                /** @description Брони, начинающиеся не позже этого времени */
+                to?: string;
+                roomId?: number;
+                /** @description По умолчанию — BOOKED */
+                status?: "BOOKED" | "STARTED" | "CANCELLED" | "NO_SHOW";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BookingResponseDto"][];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    BookingsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateBookingDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BookingResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    BookingsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateBookingDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BookingResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    BookingsController_cancel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CloseBookingDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BookingResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    BookingsController_noShow: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CloseBookingDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BookingResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    BookingsController_startVisit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartBookingVisitDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VisitDetailDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    VisitsController_startPrivate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartPrivateVisitDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VisitDetailDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    VisitsController_startPublic: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartPublicVisitDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VisitDetailDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    VisitsController_list: {
+        parameters: {
+            query?: {
+                /** @description Без параметра — история (COMPLETED и CANCELLED). CASHIER видит только последние 24 часа. */
+                status?: "ACTIVE" | "COMPLETED" | "CANCELLED";
+                roomId?: number;
+                /** @description ISO-время: с этого момента (по времени завершения/отмены) */
+                from?: string;
+                /** @description ISO-время: по этот момент */
+                to?: string;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VisitListDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    VisitsController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VisitDetailDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    VisitsController_addProduct: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddProductDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VisitDetailDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    VisitsController_addService: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddServiceDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VisitDetailDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    VisitsController_addGuests: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddGuestsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VisitDetailDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    VisitsController_extend: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExtendVisitDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VisitDetailDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    VisitsController_voidItem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+                itemId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VoidItemDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VisitDetailDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    VisitsController_addPayment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreatePaymentDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VisitDetailDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    VisitsController_complete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompleteVisitDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VisitDetailDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    VisitsController_cancel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CancelVisitDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VisitDetailDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    RoomOpsController_finishCleaning: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CleaningFinishedDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    RoomOpsController_inside: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InsideDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    RoomOpsController_completePaid: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageCountDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    LiveController_board: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LiveBoardDto"];
                 };
             };
             /** @description Ошибка */

@@ -19,6 +19,13 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { getErrorMessage } from "@/lib/get-error-message"
 import {
   useOrganization,
@@ -48,13 +55,16 @@ export default function SettingsPage() {
 function OrganizationForm({ org }: { org: Organization }) {
   const update = useUpdateOrganization()
   const [name, setName] = useState(org.name)
-  const dirty = name.trim() !== org.name
+  const [step, setStep] = useState<15 | 30 | 60>(
+    org.timeStepMinutes as 15 | 30 | 60
+  )
+  const dirty = name.trim() !== org.name || step !== org.timeStepMinutes
   const valid = name.trim().length > 0
 
   async function save(e: React.FormEvent) {
     e.preventDefault()
     try {
-      await update.mutateAsync({ name: name.trim() })
+      await update.mutateAsync({ name: name.trim(), timeStepMinutes: step })
       toast.success("Сохранено")
     } catch (err) {
       toast.error(getErrorMessage(err, "Не удалось сохранить"))
@@ -80,6 +90,28 @@ function OrganizationForm({ org }: { org: Organization }) {
                 maxLength={255}
                 onChange={(e) => setName(e.target.value)}
               />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="org-step">
+                Шаг оплачиваемого времени
+              </FieldLabel>
+              <Select
+                value={String(step)}
+                onValueChange={(v) => setStep(Number(v) as 15 | 30 | 60)}
+              >
+                <SelectTrigger id="org-step" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="15">15 минут</SelectItem>
+                  <SelectItem value="30">30 минут</SelectItem>
+                  <SelectItem value="60">60 минут (час)</SelectItem>
+                </SelectContent>
+              </Select>
+              <FieldDescription>
+                Кассир выбирает длительность посещения и продления кратно этому
+                шагу. Применяется к новым посещениям — уже начатые не меняются.
+              </FieldDescription>
             </Field>
             <div className="grid grid-cols-2 gap-4">
               <Field>

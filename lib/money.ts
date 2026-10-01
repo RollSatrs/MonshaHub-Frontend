@@ -44,3 +44,14 @@ export function formatMoney(value: string, currency = "KZT"): string {
   }).format(n)
   return `${number}\u00A0${CURRENCY_SYMBOL[currency] ?? currency}`
 }
+
+/** Совпадают ли суммы (только чтобы выбрать подпись кнопки; окончательно проверяет backend). */
+export function sameMoney(a: string, b: string): boolean {
+  if (!isValidMoney(a) || !isValidMoney(b)) return false
+  return Number(a).toFixed(2) === Number(b).toFixed(2)
+}
+
+/** "31500.00" → "31500" (для подстановки в поле ввода). */
+export function trimMoney(value: string): string {
+  return value.replace(/\.00$/, "")
+}

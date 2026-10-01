@@ -6,6 +6,8 @@ export interface ParsedApiError {
   code?: string
   message: string
   details?: string[]
+  /** Структурированные подробности (например, availableMinutes при BOOKING_CONFLICT) */
+  meta?: Record<string, unknown>
 }
 
 export function parseApiError(err: unknown, fallback = ""): ParsedApiError {
@@ -15,6 +17,7 @@ export function parseApiError(err: unknown, fallback = ""): ParsedApiError {
       code: data?.code,
       message: data?.message || fallback,
       details: data?.details,
+      meta: data?.meta,
     }
   }
   return { message: fallback }

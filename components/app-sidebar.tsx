@@ -3,7 +3,9 @@ import Link from "next/link"
 
 import * as React from "react"
 import {
-  IconDashboard,
+  IconCalendarEvent,
+  IconHistory,
+  IconLayoutGrid,
   IconDoor,
   IconFlame,
   IconMassage,
@@ -25,7 +27,11 @@ import {
 import { useCurrentUser } from "@/hooks/use-current-user"
 
 /** Пункты меню по ролям. Новые разделы добавляются вместе с их страницами. */
-const MAIN_NAV = [{ title: "Главная", url: "/", icon: IconDashboard }]
+const MAIN_NAV = [
+  { title: "Баня сейчас", url: "/", icon: IconLayoutGrid },
+  { title: "Брони", url: "/bookings", icon: IconCalendarEvent },
+  { title: "История", url: "/history", icon: IconHistory },
+]
 
 const OWNER_SETTINGS_NAV = [
   { title: "Помещения", url: "/rooms", icon: IconDoor },

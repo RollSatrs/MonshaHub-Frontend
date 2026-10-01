@@ -68,7 +68,9 @@ export function RoomCreateDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    // modal=false: без этого вложенный Select конфликтует с фокус-скоупом Dialog
+    // (два focus trap'а одновременно приводят к зацикливанию фокуса в jsdom-тестах)
+    <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
       <DialogContent>
         <form onSubmit={submit} className="space-y-4">
           <DialogHeader>
