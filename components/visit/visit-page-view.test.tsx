@@ -79,7 +79,9 @@ describe("Экран посещения", () => {
       "01:00:00"
     )
     expect(screen.getByText(/Аренда помещения · 2 ч/)).toBeInTheDocument()
-    expect(screen.getByText("Веник")).toBeInTheDocument()
+    expect(
+      screen.getByRole("button", { name: "Изменить количество: Веник" })
+    ).toHaveTextContent("Веник × 2")
     expect(screen.getByLabelText("Итого")).toHaveTextContent(/25\s000\s₸/)
     expect(screen.getByLabelText("Оплачено")).toHaveTextContent(/^0\s₸$/)
     expect(screen.getByLabelText("Осталось оплатить")).toHaveTextContent(
@@ -120,7 +122,7 @@ describe("Экран посещения", () => {
     ).toBeInTheDocument()
   })
 
-  it("«+ Товар»: тап по плитке добавляет одну единицу; нет в наличии — заблокировано", async () => {
+  it("«+ Товар»: выбранное количество добавляется; нет в наличии — заблокировано", async () => {
     const updated = visitDetail({ total: "27500.00", balance: "27500.00" })
     post.mockResolvedValue({ data: updated })
     await renderPage(visitDetail())
@@ -128,10 +130,13 @@ describe("Экран посещения", () => {
 
     const dialog = await screen.findByRole("dialog")
     expect(
-      within(dialog).getByRole("button", { name: "Добавить Чай" })
+      within(dialog).getByRole("button", { name: "Выбрать Чай" })
     ).toBeDisabled()
     await userEvent.click(
-      within(dialog).getByRole("button", { name: "Добавить Веник" })
+      within(dialog).getByRole("button", { name: "Выбрать Веник" })
+    )
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: "Добавить" })
     )
     await waitFor(() =>
       expect(post).toHaveBeenCalledWith("/visits/42/products", {
@@ -147,7 +152,10 @@ describe("Экран посещения", () => {
     await userEvent.click(screen.getByRole("button", { name: "+ Услуга" }))
     const dialog = await screen.findByRole("dialog")
     await userEvent.click(
-      within(dialog).getByRole("button", { name: "Добавить Массаж" })
+      within(dialog).getByRole("button", { name: "Выбрать Массаж" })
+    )
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: "Добавить" })
     )
     await waitFor(() =>
       expect(post).toHaveBeenCalledWith("/visits/42/services", {
@@ -223,6 +231,29 @@ describe("Экран посещения", () => {
     await waitFor(() =>
       expect(post).toHaveBeenCalledWith("/visits/42/items/2/void", {
         reason: "Добавили по ошибке",
+      })
+    )
+  })
+
+  it("по нажатию на объединённый товар можно убрать часть количества", async () => {
+    post.mockResolvedValue({ data: visitDetail() })
+    await renderPage(visitDetail())
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Изменить количество: Веник" })
+    )
+    const dialog = await screen.findByRole("dialog")
+    const quantity = within(dialog).getByLabelText("Сколько убрать")
+    await userEvent.clear(quantity)
+    await userEvent.type(quantity, "1")
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: "Убрать указанное" })
+    )
+
+    await waitFor(() =>
+      expect(post).toHaveBeenCalledWith("/visits/42/items/2/reduce", {
+        quantity: 1,
+        reason: "Лишнее количество",
       })
     )
   })

@@ -40,7 +40,10 @@ export default function ProductsPage() {
   const update = useUpdateProduct()
   const org = useOrganization()
   const currency = org.data?.currency ?? "KZT"
-
+  const visibleProducts =
+    products.data?.filter((product) =>
+      showArchived ? !product.active : product.active
+    ) ?? []
   async function setActive(product: Product, active: boolean) {
     try {
       await update.mutateAsync({ id: product.id, active })
@@ -78,12 +81,18 @@ export default function ProductsPage() {
         <LoadingRows />
       ) : products.isError ? (
         <ErrorState onRetry={() => products.refetch()} />
-      ) : products.data.length === 0 ? (
+      ) : visibleProducts.length === 0 ? (
         <EmptyState
-          title="Товаров пока нет"
-          description="Добавьте веники, шапки, воду, чай — всё, что продаёте клиентам."
+          title={showArchived ? "Архивных товаров нет" : "Товаров пока нет"}
+          description={
+            showArchived
+              ? "Товары, отправленные в архив, появятся здесь."
+              : "Добавьте веники, шапки, воду, чай — всё, что продаёте клиентам."
+          }
           action={
-            <Button onClick={() => setCreating(true)}>Добавить товар</Button>
+            showArchived ? undefined : (
+              <Button onClick={() => setCreating(true)}>Добавить товар</Button>
+            )
           }
         />
       ) : (
@@ -99,7 +108,7 @@ export default function ProductsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {products.data.map((p) => (
+              {visibleProducts.map((p) => (
                 <TableRow
                   key={p.id}
                   className={p.active ? undefined : "text-muted-foreground"}

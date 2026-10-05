@@ -31,19 +31,23 @@ function renderDialog(add = vi.fn().mockResolvedValue(undefined), extra = {}) {
 }
 
 describe("CatalogDialog", () => {
-  it("тап по плитке добавляет одну единицу и не закрывает окно", async () => {
+  it("позволяет указать точное количество и не закрывает окно", async () => {
     const add = renderDialog()
-    await userEvent.click(
-      screen.getByRole("button", { name: "Добавить Веник" })
-    )
-    await waitFor(() => expect(add).toHaveBeenCalledWith(1))
+    await userEvent.click(screen.getByRole("button", { name: "Выбрать Веник" }))
+    const quantity = screen.getByRole("spinbutton", {
+      name: "Количество: Веник",
+    })
+    await userEvent.clear(quantity)
+    await userEvent.type(quantity, "6")
+    await userEvent.click(screen.getByRole("button", { name: "Добавить" }))
+    await waitFor(() => expect(add).toHaveBeenCalledWith(1, 6))
     expect(screen.getByRole("dialog")).toBeInTheDocument()
   })
 
   it("остаток и цена видны; нет в наличии — заблокировано; уже добавленное количество отмечено", () => {
     renderDialog()
     expect(screen.getByText(/10 шт\./)).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "Добавить Чай" })).toBeDisabled()
+    expect(screen.getByRole("button", { name: "Выбрать Чай" })).toBeDisabled()
     expect(screen.getByText(/нет в наличии/)).toBeInTheDocument()
     expect(screen.getByText("×2")).toBeInTheDocument()
   })
@@ -56,11 +60,10 @@ describe("CatalogDialog", () => {
   it("ошибка добавления (например, кончился остаток) не ломает окно", async () => {
     const add = vi.fn().mockRejectedValue(new Error("boom"))
     renderDialog(add)
-    await userEvent.click(
-      screen.getByRole("button", { name: "Добавить Веник" })
-    )
+    await userEvent.click(screen.getByRole("button", { name: "Выбрать Веник" }))
+    await userEvent.click(screen.getByRole("button", { name: "Добавить" }))
     await waitFor(() => expect(add).toHaveBeenCalled())
-    expect(screen.getByRole("button", { name: "Добавить Веник" })).toBeEnabled()
+    expect(screen.getByRole("button", { name: "Выбрать Веник" })).toBeEnabled()
   })
 
   it("пустой каталог и ошибка загрузки", () => {

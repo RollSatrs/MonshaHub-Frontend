@@ -10,6 +10,7 @@ import { ErrorState, LoadingRows } from "@/components/state-views"
 import { CatalogDialog } from "@/components/visit/catalog-dialog"
 import { ExtendDialog } from "@/components/visit/extend-dialog"
 import { PaymentDialog } from "@/components/visit/payment-dialog"
+import { ItemQuantityDialog } from "@/components/visit/item-quantity-dialog"
 import { ReasonDialog } from "@/components/visit/reason-dialog"
 import { VisitBill } from "@/components/visit/visit-bill"
 import { VisitHeader } from "@/components/visit/visit-header"
@@ -25,6 +26,7 @@ import {
   useAddService,
   useCancelVisit,
   useVisit,
+  useReduceItem,
   useVoidItem,
 } from "@/lib/queries/visits"
 import type { VisitDetail, VisitItem } from "@/lib/api/types"
@@ -71,6 +73,7 @@ function VisitScreen({
   const nowMs = useServerNow(visit.serverTime, receivedAt)
   const [dialog, setDialog] = useState<Dialog>(null)
   const [voiding, setVoiding] = useState<VisitItem | null>(null)
+  const [editingQuantity, setEditingQuantity] = useState<VisitItem | null>(null)
 
   const active = visit.status === "ACTIVE"
   const products = useProducts(false)
@@ -79,6 +82,7 @@ function VisitScreen({
   const addService = useAddService(visit.id)
   const addGuests = useAddGuests(visit.id)
   const voidItem = useVoidItem(visit.id)
+  const reduceItem = useReduceItem(visit.id)
   const cancel = useCancelVisit(visit.id)
 
   /** Сколько уже добавлено в чек (по названию из snapshot) — только подсказка на плитках. */
@@ -102,7 +106,12 @@ function VisitScreen({
   return (
     <>
       <VisitHeader visit={visit} timezone={timezone} nowMs={nowMs} />
-      <VisitBill visit={visit} timezone={timezone} onVoid={setVoiding} />
+      <VisitBill
+        visit={visit}
+        timezone={timezone}
+        onVoid={setVoiding}
+        onEditQuantity={setEditingQuantity}
+      />
 
       {active ? (
         <div className="bg-background/95 sticky bottom-0 -mx-4 flex flex-wrap items-center gap-2 border-t px-4 py-3 backdrop-blur md:-mx-6 md:px-6">
@@ -182,7 +191,9 @@ function VisitScreen({
         currency={visit.currency}
         addedCounts={byName(products.data, addedProducts)}
         total={visit.total}
-        add={(productId) => addProduct.mutateAsync({ productId, quantity: 1 })}
+        add={(productId, quantity) =>
+          addProduct.mutateAsync({ productId, quantity })
+        }
       />
       <CatalogDialog
         open={dialog === "service"}
@@ -199,7 +210,9 @@ function VisitScreen({
         currency={visit.currency}
         addedCounts={byName(services.data, addedServices)}
         total={visit.total}
-        add={(serviceId) => addService.mutateAsync({ serviceId, quantity: 1 })}
+        add={(serviceId, quantity) =>
+          addService.mutateAsync({ serviceId, quantity })
+        }
       />
       <ExtendDialog
         visit={visit}
@@ -233,6 +246,21 @@ function VisitScreen({
           if (!voiding) return
           await voidItem.mutateAsync({ itemId: voiding.id, reason })
           toast.success("Позиция убрана")
+        }}
+      />
+      <ItemQuantityDialog
+        key={editingQuantity?.id ?? "closed"}
+        item={editingQuantity}
+        pending={reduceItem.isPending}
+        onOpenChange={(open) => !open && setEditingQuantity(null)}
+        onSubmit={async ({ quantity, reason }) => {
+          if (!editingQuantity) return
+          await reduceItem.mutateAsync({
+            itemId: editingQuantity.id,
+            quantity,
+            reason,
+          })
+          setEditingQuantity(null)
         }}
       />
       <ReasonDialog

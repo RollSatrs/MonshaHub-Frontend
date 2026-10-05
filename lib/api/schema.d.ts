@@ -639,6 +639,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/visits/{id}/items/{itemId}/reduce": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Уменьшить количество позиции
+         * @description Убранная часть сохраняется в аудите. Для товара количество возвращается на склад движением SALE_RETURN.
+         */
+        post: operations["VisitsController_reduceItem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/visits/{id}/payments": {
         parameters: {
             query?: never;
@@ -1322,6 +1342,12 @@ export interface components {
         VoidItemDto: {
             /** @example Добавили по ошибке */
             reason: string;
+        };
+        ReduceItemDto: {
+            /** @example Добавили по ошибке */
+            reason: string;
+            /** @example 2 */
+            quantity: number;
         };
         CreatePaymentDto: {
             /** @enum {string} */
@@ -2944,6 +2970,41 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["VoidItemDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VisitDetailDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    VisitsController_reduceItem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+                itemId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReduceItemDto"];
             };
         };
         responses: {

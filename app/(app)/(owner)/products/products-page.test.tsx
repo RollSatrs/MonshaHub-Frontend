@@ -6,7 +6,11 @@ import ProductsPage from "./page"
 
 const get = vi.fn()
 vi.mock("@/lib/api", () => ({
-  api: { get: (...a: unknown[]) => get(...a), patch: vi.fn(), post: vi.fn() },
+  api: {
+    get: (...a: unknown[]) => get(...a),
+    patch: vi.fn(),
+    post: vi.fn(),
+  },
 }))
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
 
@@ -78,16 +82,38 @@ describe("ProductsPage", () => {
     expect(await screen.findByText("Веник")).toBeInTheDocument()
   })
 
-  it("«Показать архивные» запрашивает includeInactive=true", async () => {
+  it("«Показать архивные» показывает только архивные товары", async () => {
+    mockApi([
+      { id: 1, name: "Активный товар", price: "100.00", stock: 5, active: true },
+      { id: 2, name: "Архивный товар", price: "200.00", stock: 3, active: false },
+    ])
+    const user = userEvent.setup()
+    renderPage()
+
+    expect(await screen.findByText("Активный товар")).toBeInTheDocument()
+    expect(screen.queryByText("Архивный товар")).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole("switch", { name: "Показать архивные" }))
+
+    expect(await screen.findByText("Архивный товар")).toBeInTheDocument()
+    expect(screen.queryByText("Активный товар")).not.toBeInTheDocument()
+    expect(get).toHaveBeenCalledWith("/products", {
+      params: { includeInactive: true },
+    })
+  })
+
+  it("показывает отдельное пустое состояние для архива", async () => {
     mockApi([])
     const user = userEvent.setup()
     renderPage()
     await screen.findByText("Товаров пока нет")
 
     await user.click(screen.getByRole("switch", { name: "Показать архивные" }))
-    await screen.findByText("Товаров пока нет")
-    expect(get).toHaveBeenCalledWith("/products", {
-      params: { includeInactive: true },
-    })
+
+    expect(await screen.findByText("Архивных товаров нет")).toBeInTheDocument()
+    expect(
+      screen.getByText("Товары, отправленные в архив, появятся здесь.")
+    ).toBeInTheDocument()
   })
+
 })

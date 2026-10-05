@@ -25,6 +25,7 @@ interface Props {
   visit: VisitDetail
   timezone: string
   onVoid: (item: VisitItem) => void
+  onEditQuantity: (item: VisitItem) => void
 }
 
 function itemTitle(item: VisitItem) {
@@ -36,7 +37,7 @@ function itemTitle(item: VisitItem) {
 }
 
 /** Позиции чека, платежи и итоги — всё значения от backend. Убранные позиции остаются видны (аудит). */
-export function VisitBill({ visit, timezone, onVoid }: Props) {
+export function VisitBill({ visit, timezone, onVoid, onEditQuantity }: Props) {
   const active = visit.status === "ACTIVE"
   const money = (v: string) => formatMoney(v, visit.currency)
 
@@ -61,11 +62,27 @@ export function VisitBill({ visit, timezone, onVoid }: Props) {
                 data-testid={`item-${item.id}`}
               >
                 <TableCell>
-                  <p
-                    className={cn("font-medium", item.voided && "line-through")}
-                  >
-                    {itemTitle(item)}
-                  </p>
+                  {active &&
+                  !item.voided &&
+                  (item.kind === "PRODUCT" || item.kind === "SERVICE") ? (
+                    <button
+                      type="button"
+                      className="hover:text-primary font-medium underline-offset-4 hover:underline"
+                      onClick={() => onEditQuantity(item)}
+                      aria-label={`Изменить количество: ${itemTitle(item)}`}
+                    >
+                      {itemTitle(item)} × {item.quantity}
+                    </button>
+                  ) : (
+                    <p
+                      className={cn(
+                        "font-medium",
+                        item.voided && "line-through"
+                      )}
+                    >
+                      {itemTitle(item)}
+                    </p>
+                  )}
                   <p className="text-muted-foreground text-xs">
                     {ITEM_KIND_LABEL[item.kind]} ·{" "}
                     {formatDayTime(item.createdAt, timezone)}

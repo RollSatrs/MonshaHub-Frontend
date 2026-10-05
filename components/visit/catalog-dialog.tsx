@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { toast } from "sonner"
 import { ErrorState, LoadingRows } from "@/components/state-views"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
   Dialog,
@@ -36,11 +37,11 @@ interface Props {
   addedCounts: Map<number, number>
   /** Итог чека от backend, чтобы кассир видел результат каждого тапа */
   total: string
-  add: (id: number) => Promise<unknown>
+  add: (id: number, quantity: number) => Promise<unknown>
 }
 
 /**
- * Быстрый выбор товара/услуги: один тап = одна единица в чек, окно остаётся открытым.
+ * Выбор товара/услуги с точным количеством; окно остаётся открытым после добавления.
  * Цену, остаток и итог считает backend.
  */
 export function CatalogDialog(props: Props) {
@@ -51,7 +52,7 @@ export function CatalogDialog(props: Props) {
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
-            Нажмите на позицию, чтобы добавить одну единицу в чек.
+            Выберите позицию и укажите точное количество.
           </DialogDescription>
         </DialogHeader>
         {open && <CatalogBody {...props} />}
@@ -72,11 +73,24 @@ function CatalogBody({
 }: Props) {
   const [query, setQuery] = useState("")
   const [busyId, setBusyId] = useState<number | null>(null)
+  const [selectedId, setSelectedId] = useState<number | null>(null)
+  const [quantity, setQuantity] = useState("1")
+  const [error, setError] = useState("")
 
-  async function tap(entry: CatalogEntry) {
+  async function submit(e: React.FormEvent) {
+    e.preventDefault()
+    const entry = entries?.find((item) => item.id === selectedId)
+    if (!entry) return
+    const value = Number(quantity)
+    if (!Number.isInteger(value) || value < 1)
+      return setError("Количество должно быть целым числом не меньше 1")
+    if (entry.stock !== undefined && value > entry.stock)
+      return setError(`На складе доступно только ${entry.stock} шт.`)
+    setError("")
     setBusyId(entry.id)
     try {
-      await add(entry.id)
+      await add(entry.id, value)
+      setQuantity("1")
     } catch (err) {
       toast.error(getErrorMessage(err, "Не удалось добавить"))
     } finally {
@@ -96,6 +110,7 @@ function CatalogBody({
   const shown = entries.filter((e) =>
     e.name.toLowerCase().includes(query.trim().toLowerCase())
   )
+  const selected = entries.find((entry) => entry.id === selectedId)
   return (
     <div className="space-y-3">
       {entries.length > 8 && (
@@ -115,14 +130,19 @@ function CatalogBody({
               key={e.id}
               type="button"
               disabled={out || busyId !== null}
-              onClick={() => tap(e)}
+              onClick={() => {
+                setSelectedId(e.id)
+                setQuantity("1")
+                setError("")
+              }}
               className={cn(
                 "relative flex min-h-24 flex-col items-start justify-between rounded-xl border p-3 text-left transition-colors",
                 "hover:border-primary hover:bg-primary-subtle focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
                 "disabled:cursor-not-allowed disabled:opacity-50",
-                busyId === e.id && "border-primary bg-primary-subtle"
+                (busyId === e.id || selectedId === e.id) &&
+                  "border-primary bg-primary-subtle"
               )}
-              aria-label={`Добавить ${e.name}`}
+              aria-label={`Выбрать ${e.name}`}
             >
               <span className="font-medium">{e.name}</span>
               <span className="text-sm tabular-nums">
@@ -147,6 +167,41 @@ function CatalogBody({
           )
         })}
       </div>
+      {selected && (
+        <form
+          onSubmit={submit}
+          className="bg-secondary/60 flex flex-wrap items-end gap-3 rounded-xl p-3"
+        >
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-medium">{selected.name}</p>
+            <label
+              htmlFor="catalog-quantity"
+              className="text-muted-foreground text-xs"
+            >
+              Количество
+            </label>
+          </div>
+          <Input
+            id="catalog-quantity"
+            className="w-28"
+            type="number"
+            min={1}
+            max={selected.stock ?? 1000}
+            step={1}
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            aria-label={`Количество: ${selected.name}`}
+          />
+          <Button type="submit" disabled={busyId !== null}>
+            {busyId === selected.id ? "Добавление…" : "Добавить"}
+          </Button>
+          {error && (
+            <p role="alert" className="text-danger basis-full text-sm">
+              {error}
+            </p>
+          )}
+        </form>
+      )}
       <p className="text-muted-foreground text-right text-sm">
         Итог чека:{" "}
         <span className="text-foreground font-semibold tabular-nums">

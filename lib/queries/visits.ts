@@ -124,6 +124,14 @@ export const useVoidItem = visitAction<{ itemId: number; reason: string }>(
   (id, i) => `/visits/${id}/items/${i.itemId}/void`,
   (i) => ({ reason: i.reason })
 )
+export const useReduceItem = visitAction<{
+  itemId: number
+  quantity: number
+  reason: string
+}>(
+  (id, i) => `/visits/${id}/items/${i.itemId}/reduce`,
+  (i) => ({ quantity: i.quantity, reason: i.reason })
+)
 export const useAddPayment = visitAction<{
   method: PaymentMethod
   amount: string
