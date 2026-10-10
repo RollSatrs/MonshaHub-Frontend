@@ -114,7 +114,7 @@ function VisitScreen({
       />
 
       {active ? (
-        <div className="bg-background/95 sticky bottom-0 -mx-4 flex flex-wrap items-center gap-2 border-t px-4 py-3 backdrop-blur md:-mx-6 md:px-6">
+        <div className="sticky bottom-0 -mx-3 flex flex-wrap items-center gap-2 border-t border-border bg-background/95 px-3 py-3 shadow-[0_-3px_12px_rgba(22,25,28,.08)] backdrop-blur md:-mx-4 md:px-4 lg:-mx-5 lg:px-5">
           <Button
             size="lg"
             variant="outline"

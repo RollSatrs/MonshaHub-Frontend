@@ -52,6 +52,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/pin-login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AuthController_pinLogin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/me": {
         parameters: {
             query?: never;
@@ -796,6 +812,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/branches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["BranchesController_list"];
+        put?: never;
+        post: operations["BranchesController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/branches/current": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["BranchesController_current"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/branches/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["BranchesController_update"];
+        trace?: never;
+    };
+    "/workplaces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["WorkplacesController_list"];
+        put?: never;
+        post: operations["WorkplacesController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workplaces/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["WorkplacesController_update"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -837,6 +933,7 @@ export interface components {
             id: number;
             /** @example 1 */
             organizationId: number;
+            branchId: number | null;
             /** @example Иван Иванов */
             fullname: string;
             /** @example owner@example.com */
@@ -854,6 +951,14 @@ export interface components {
             email: string;
             password: string;
         };
+        PinLoginDto: {
+            /** @example owner@monshahub.demo */
+            email: string;
+            /** @example 1234 */
+            pin: string;
+            /** @description Токен зарегистрированного моноблока */
+            workplaceToken?: string;
+        };
         MessageResponseDto: {
             message: string;
         };
@@ -870,6 +975,7 @@ export interface components {
             id: number;
             /** @example 1 */
             organizationId: number;
+            branchId: number | null;
             /** @example Иван Иванов */
             fullname: string;
             /** @example owner@example.com */
@@ -881,15 +987,23 @@ export interface components {
             active: boolean;
         };
         CreateCashierDto: {
+            /** @example 1 */
+            branchId?: number;
             /** @example Айгуль Касымова */
             fullname: string;
             /** @example cashier@example.com */
             email: string;
-            password: string;
+            /** @deprecated */
+            password?: string;
+            /** @example 1234 */
+            pin?: string;
         };
         UpdateStaffDto: {
             /** @description false — деактивировать кассира (доступ закрывается сразу), true — вернуть доступ */
-            active: boolean;
+            active?: boolean;
+            branchId?: number;
+            /** @example 1234 */
+            pin?: string;
         };
         OrganizationResponseDto: {
             /** @example 1 */
@@ -1458,6 +1572,65 @@ export interface components {
             timeStepMinutes: number;
             rooms: components["schemas"]["LiveRoomDto"][];
         };
+        BranchResponseDto: {
+            id: number;
+            organizationId: number;
+            name: string;
+            address: string | null;
+            phone: string | null;
+            timezone: string;
+            active: boolean;
+        };
+        CreateBranchDto: {
+            /** @example Основной */
+            name: string;
+            /** @example ул. Абая, 10 */
+            address?: string;
+            /** @example +7 700 000 00 00 */
+            phone?: string;
+            /** @example Asia/Almaty */
+            timezone?: string;
+        };
+        UpdateBranchDto: {
+            /** @example Основной */
+            name?: string;
+            /** @example ул. Абая, 10 */
+            address?: string;
+            /** @example +7 700 000 00 00 */
+            phone?: string;
+            /** @example Asia/Almaty */
+            timezone?: string;
+            active?: boolean;
+        };
+        WorkplaceResponseDto: {
+            id: number;
+            branchId: number;
+            branchName: string;
+            name: string;
+            active: boolean;
+            lastSeenAt: string | null;
+        };
+        CreateWorkplaceDto: {
+            /** @example Касса №1 */
+            name: string;
+            /** @example 1 */
+            branchId: number;
+        };
+        CreatedWorkplaceResponseDto: {
+            id: number;
+            branchId: number;
+            branchName: string;
+            name: string;
+            active: boolean;
+            lastSeenAt: string | null;
+            /** @description Показывается только один раз после создания */
+            activationToken: string;
+        };
+        UpdateWorkplaceDto: {
+            name?: string;
+            branchId?: number;
+            active?: boolean;
+        };
     };
     responses: never;
     parameters: never;
@@ -1531,6 +1704,39 @@ export interface operations {
         };
         responses: {
             /** @description Устанавливает httpOnly cookie сессии */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthUserResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    AuthController_pinLogin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PinLoginDto"];
+            };
+        };
+        responses: {
+            /** @description Вход на рабочем месте по email и четырёхзначному PIN */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -3234,6 +3440,222 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LiveBoardDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    BranchesController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BranchResponseDto"][];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    BranchesController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateBranchDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BranchResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    BranchesController_current: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BranchResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    BranchesController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateBranchDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BranchResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    WorkplacesController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkplaceResponseDto"][];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    WorkplacesController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateWorkplaceDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreatedWorkplaceResponseDto"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponseDto"];
+                };
+            };
+        };
+    };
+    WorkplacesController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateWorkplaceDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkplaceResponseDto"];
                 };
             };
             /** @description Ошибка */

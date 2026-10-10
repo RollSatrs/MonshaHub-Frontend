@@ -4,31 +4,31 @@ import type { RoomState } from "@/lib/api/types"
 
 export const STATE_STYLES: Record<RoomState, { card: string; pill: string }> = {
   AVAILABLE: {
-    card: "bg-card border-border hover:border-primary/50",
+    card: "bg-card border-border border-l-primary hover:border-primary/55",
     pill: "bg-primary-subtle text-success",
   },
   OCCUPIED: {
-    card: "bg-primary-subtle border-primary/30 hover:border-primary",
+    card: "bg-primary-subtle/65 border-primary/25 border-l-primary hover:border-primary/55",
     pill: "bg-primary text-primary-foreground",
   },
   ENDING_SOON: {
-    card: "bg-warning-subtle border-warning/40 hover:border-warning",
+    card: "bg-warning-subtle border-warning/30 border-l-warning hover:border-warning/60",
     pill: "bg-warning text-white",
   },
   OVERTIME: {
-    card: "bg-danger-subtle border-danger/40 hover:border-danger",
+    card: "bg-danger-subtle border-danger/30 border-l-danger hover:border-danger/60",
     pill: "bg-danger text-white",
   },
   CLEANING: {
-    card: "bg-secondary border-border",
-    pill: "bg-foreground/80 text-background",
+    card: "bg-secondary border-border border-l-muted-foreground",
+    pill: "bg-muted-foreground text-white",
   },
   OPEN: {
-    card: "bg-card border-border",
+    card: "bg-card border-border border-l-primary",
     pill: "bg-primary-subtle text-success",
   },
   FULL: {
-    card: "bg-danger-subtle border-danger/40",
+    card: "bg-danger-subtle border-danger/30 border-l-danger",
     pill: "bg-danger text-white",
   },
 }
@@ -44,7 +44,7 @@ export function StatePill({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold tracking-wide",
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide uppercase",
         STATE_STYLES[state].pill,
         className
       )}

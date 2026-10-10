@@ -22,7 +22,7 @@ export function ErrorState({
   return (
     <div
       role="alert"
-      className="bg-danger-subtle text-danger flex flex-col items-center gap-3 rounded-xl border border-danger/30 p-8 text-center"
+      className="bg-danger-subtle text-danger flex flex-col items-center gap-3 rounded-[4px] border border-danger/30 p-8 text-center"
     >
       <IconAlertTriangle className="size-6" aria-hidden />
       <p className="font-medium">{message}</p>
@@ -45,7 +45,7 @@ export function EmptyState({
   action?: React.ReactNode
 }) {
   return (
-    <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed p-10 text-center">
+    <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border bg-white p-10 text-center shadow-sm">
       <IconInbox className="text-muted-foreground size-8" aria-hidden />
       <p className="font-medium">{title}</p>
       {description && (

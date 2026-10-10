@@ -43,7 +43,7 @@ export function VisitBill({ visit, timezone, onVoid, onEditQuantity }: Props) {
 
   return (
     <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-      <Card className="gap-0 overflow-x-auto p-0">
+      <Card className="gap-0 overflow-x-auto border-t-[3px] border-t-primary p-0">
         <Table>
           <TableHeader>
             <TableRow>
@@ -128,7 +128,10 @@ export function VisitBill({ visit, timezone, onVoid, onEditQuantity }: Props) {
         </Table>
       </Card>
 
-      <Card className="h-fit gap-3 p-5">
+      <Card className="h-fit gap-3 border-t-[3px] border-t-primary p-5">
+        <p className="-mx-5 -mt-5 rounded-t-lg bg-primary-subtle px-4 py-2 text-sm font-semibold text-primary">
+          Счёт
+        </p>
         <dl className="space-y-2">
           <div className="flex justify-between text-lg">
             <dt>Итого</dt>

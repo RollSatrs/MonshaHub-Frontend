@@ -22,7 +22,11 @@ export function NavMain({
   const pathname = usePathname()
   return (
     <SidebarGroup>
-      {label && <SidebarGroupLabel>{label}</SidebarGroupLabel>}
+      {label && (
+        <SidebarGroupLabel className="px-3 text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">
+          {label}
+        </SidebarGroupLabel>
+      )}
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => (
@@ -30,6 +34,7 @@ export function NavMain({
               <SidebarMenuButton
                 asChild
                 tooltip={item.title}
+                className="h-10 rounded-lg border-l-3 border-transparent px-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[active=true]:border-primary data-[active=true]:bg-sidebar-accent data-[active=true]:font-semibold data-[active=true]:text-primary"
                 isActive={
                   item.url === "/"
                     ? pathname === "/"

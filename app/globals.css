@@ -53,7 +53,7 @@
 }
 
 :root {
-  --radius: 0.75rem; /* карточки 12px; md=10px, sm=8px */
+  --radius: 0.65rem;
   --background: #f2f1ee;
   --foreground: #16191c;
   --card: #ffffff;
@@ -100,6 +100,92 @@
   }
   body {
     @apply bg-background text-foreground;
+    min-width: 320px;
+    background-image: linear-gradient(180deg, #faf9f7 0, #f2f1ee 240px);
+    background-attachment: fixed;
+  }
+  button,
+  a,
+  [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  ::selection {
+    background: #cfe4df;
+    color: #0f4f48;
+  }
+}
+
+@layer components {
+  .modern-panel {
+    @apply border border-border bg-card shadow-[0_1px_2px_rgba(22,25,28,0.06)];
+  }
+
+  .modern-section-bar {
+    @apply border-b border-primary/15 bg-primary-subtle px-3 py-2 text-sm font-semibold text-primary;
+  }
+}
+
+/*
+ * Сенсорные моноблоки часто имеют десктопное разрешение, поэтому обычных
+ * mobile-breakpoint недостаточно. Увеличиваем именно интерактивные зоны,
+ * когда устройство сообщает о неточном (пальцевом) указателе.
+ */
+@media (pointer: coarse) {
+  [data-slot="button"] {
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+  }
+
+  [data-slot="input"],
+  [data-slot="select-trigger"] {
+    min-height: 2.75rem;
+    font-size: 1rem;
+  }
+
+  [data-slot="sidebar-menu-button"] {
+    min-height: 3rem;
+  }
+
+  [data-slot="dropdown-menu-item"],
+  [data-slot="select-item"],
+  [data-slot="tabs-trigger"] {
+    min-height: 2.75rem;
+  }
+
+  [data-slot="dialog-close"] {
+    display: inline-flex;
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+    align-items: center;
+    justify-content: center;
+  }
+
+  [data-slot="dialog-content"] {
+    max-height: calc(100svh - 2rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  [data-slot="table-cell"] {
+    height: 3.25rem;
+  }
+
+  [data-testid^="room-"] {
+    min-height: 11.5rem;
+  }
+}
+
+@media (pointer: coarse) and (max-height: 850px) {
+  [data-slot="dialog-content"] {
+    max-height: calc(100svh - 1rem);
+  }
+}
+
+@media (pointer: coarse) and (hover: none) {
+  [data-testid^="room-"]:hover,
+  [aria-label^="Выбрать "]:hover {
+    transform: none;
   }
 }
 

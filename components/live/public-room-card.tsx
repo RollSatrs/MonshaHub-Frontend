@@ -54,13 +54,13 @@ export function PublicRoomCard({ room, currency, onGroup, onInside }: Props) {
   return (
     <div
       className={cn(
-        "flex min-h-[156px] w-full flex-col gap-3 rounded-xl border p-4",
+        "flex min-h-[176px] w-full flex-col gap-3 rounded-xl border border-l-4 p-4 shadow-[0_1px_3px_rgba(22,25,28,.08)]",
         STATE_STYLES[room.state].card
       )}
       data-testid={`room-${room.id}`}
     >
       <div className="flex items-start justify-between gap-2">
-        <h2 className="text-lg font-semibold">{room.name}</h2>
+        <h2 className="text-base font-semibold text-foreground">{room.name}</h2>
         <StatePill state={room.state} />
       </div>
 

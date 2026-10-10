@@ -21,15 +21,29 @@ import {
 } from "@/components/ui/table"
 import { useCurrentUser } from "@/hooks/use-current-user"
 import { getErrorMessage } from "@/lib/get-error-message"
-import { useSetStaffActive, useStaff } from "@/lib/queries/staff"
+import {
+  useSetStaffActive,
+  useStaff,
+  useUpdateStaff,
+} from "@/lib/queries/staff"
 import type { StaffMember } from "@/lib/api/types"
+import { useBranches } from "@/lib/queries/branches"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 const ROLE_LABEL = { OWNER: "Владелец", CASHIER: "Кассир" } as const
 
 export default function StaffPage() {
   const me = useCurrentUser()
   const staff = useStaff()
+  const branches = useBranches()
   const setActive = useSetStaffActive()
+  const updateStaff = useUpdateStaff()
   const [creating, setCreating] = useState(false)
   const [deactivating, setDeactivating] = useState<StaffMember | null>(null)
 
@@ -67,6 +81,7 @@ export default function StaffPage() {
                 <TableHead>Имя</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Роль</TableHead>
+                <TableHead>Филиал</TableHead>
                 <TableHead>Статус</TableHead>
                 <TableHead className="w-40" />
               </TableRow>
@@ -87,6 +102,47 @@ export default function StaffPage() {
                   </TableCell>
                   <TableCell>{m.email}</TableCell>
                   <TableCell>{ROLE_LABEL[m.role]}</TableCell>
+                  <TableCell>
+                    {m.role === "OWNER" ? (
+                      "Все филиалы"
+                    ) : (
+                      <Select
+                        value={m.branchId ? String(m.branchId) : undefined}
+                        onValueChange={async (value) => {
+                          try {
+                            await updateStaff.mutateAsync({
+                              id: m.id,
+                              input: { branchId: Number(value) },
+                            })
+                            toast.success("Филиал кассира изменён")
+                          } catch (error) {
+                            toast.error(
+                              getErrorMessage(
+                                error,
+                                "Не удалось изменить филиал"
+                              )
+                            )
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="min-h-10 w-44">
+                          <SelectValue placeholder="Не назначен" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {branches.data
+                            ?.filter((branch) => branch.active)
+                            .map((branch) => (
+                              <SelectItem
+                                key={branch.id}
+                                value={String(branch.id)}
+                              >
+                                {branch.name}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </TableCell>
                   <TableCell>
                     <ActiveBadge active={m.active} />
                   </TableCell>

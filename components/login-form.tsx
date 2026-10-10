@@ -1,6 +1,10 @@
 "use client"
 
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { IconBackspace, IconEraser } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
+import { getWorkplaceToken } from "@/lib/branch-context"
 import { Button } from "@/components/ui/button"
 import {
   Field,
@@ -9,42 +13,54 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { useEffect, useState } from "react"
+import { Spinner } from "@/components/ui/spinner"
 import { api } from "@/lib/api"
 import { getErrorMessage } from "@/lib/get-error-message"
-import { Spinner } from "./ui/spinner"
-import { useRouter } from "next/navigation"
+
+const KEYS = ["7", "8", "9", "4", "5", "6", "1", "2", "3", "←", "0", "."]
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
   const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [pin, setPin] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [now, setNow] = useState<Date | null>(null)
   const router = useRouter()
 
   useEffect(() => {
     if (!error) return
-    const timer = setTimeout(() => {
-      setError("")
-    }, 2000)
+    const timer = setTimeout(() => setError(""), 2000)
     return () => clearTimeout(timer)
   }, [error])
 
-  const handlerLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    const initial = window.setTimeout(() => setNow(new Date()), 0)
+    const timer = window.setInterval(() => setNow(new Date()), 30_000)
+    return () => {
+      window.clearTimeout(initial)
+      window.clearInterval(timer)
+    }
+  }, [])
+
+  async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setLoading(true)
 
-    if (password.length < 8) {
-      setError("Пароль должен содержать не менее 8 символов.")
+    if (!/^\d{4}$/.test(pin)) {
+      setError("PIN должен состоять из 4 цифр.")
       setLoading(false)
       return
     }
 
     try {
-      await api.post("/auth/login", { email, password })
+      await api.post("/auth/pin-login", {
+        email,
+        pin,
+        workplaceToken: getWorkplaceToken() ?? undefined,
+      })
       router.push("/")
     } catch (err) {
       console.error(err)
@@ -56,88 +72,153 @@ export function LoginForm({
 
   return (
     <form
-      onSubmit={handlerLogin}
-      className={cn("flex flex-col gap-6", className)}
+      noValidate
+      onSubmit={handleLogin}
+      className={cn("flex flex-col text-white", className)}
       {...props}
     >
-      <FieldGroup>
-        <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-bold">Вход в аккаунт</h1>
-          <p className="text-muted-foreground text-sm text-balance">
-            Введите свой email, чтобы войти в аккаунт
-          </p>
-        </div>
-        <Field>
-          <FieldLabel htmlFor="email">Email</FieldLabel>
+      <div className="mb-3 text-center">
+        <p className="text-4xl leading-none font-light tabular-nums">
+          {now
+            ? new Intl.DateTimeFormat("ru-RU", {
+                hour: "2-digit",
+                minute: "2-digit",
+              }).format(now)
+            : "--:--"}
+        </p>
+        <p className="mt-2 text-sm text-white/65">
+          {now
+            ? new Intl.DateTimeFormat("ru-RU", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              }).format(now)
+            : "Загрузка даты"}
+        </p>
+        <p className="text-xs tracking-[0.15em] text-white/55 uppercase">
+          {now
+            ? new Intl.DateTimeFormat("ru-RU", { weekday: "long" }).format(now)
+            : ""}
+        </p>
+        <p className="mt-2 text-base leading-snug text-white/90">
+          Для входа введите email и PIN-код
+        </p>
+      </div>
+
+      <FieldGroup className="gap-2">
+        <Field className="gap-1.5">
+          <FieldLabel htmlFor="email" className="sr-only">
+            Email
+          </FieldLabel>
           <Input
             id="email"
             type="email"
-            placeholder="m@example.com"
+            placeholder="Email сотрудника"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            autoComplete="username"
+            className="h-12 rounded-none border-white/35 bg-white text-center text-base text-foreground placeholder:text-muted-foreground focus-visible:border-white focus-visible:ring-white/20"
             required
           />
         </Field>
-        <Field>
-          <div className="flex items-center">
-            <FieldLabel htmlFor="password">Пароль</FieldLabel>
-            <a
-              href="/forgot-password"
-              className="ml-auto text-sm underline-offset-4 hover:underline"
-            >
-              Забыли пароль?
-            </a>
-          </div>
+
+        <Field className="gap-1.5">
+          <FieldLabel htmlFor="pin" className="sr-only">
+            PIN-код
+          </FieldLabel>
           <Input
-            id="password"
+            id="pin"
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            inputMode="numeric"
+            pattern="[0-9]{4}"
+            maxLength={4}
+            placeholder="PIN-код"
+            value={pin}
+            onChange={(e) =>
+              setPin(e.target.value.replace(/\D/g, "").slice(0, 4))
+            }
+            autoComplete="off"
+            className="h-12 rounded-none border-white/35 bg-white/10 text-center text-xl tracking-[0.35em] text-white placeholder:text-base placeholder:tracking-normal placeholder:text-white/50 focus-visible:border-white focus-visible:ring-white/20"
             required
           />
         </Field>
 
         <div
+          className="grid grid-cols-3 gap-1"
+          aria-label="Цифровая клавиатура"
+        >
+          {KEYS.map((key) => (
+            <button
+              key={key}
+              type="button"
+              className="flex h-14 items-center justify-center border border-white/45 bg-white/10 text-3xl font-light text-white transition-colors hover:bg-white/18 active:bg-white/25 disabled:cursor-not-allowed disabled:opacity-35"
+              onClick={() =>
+                key === "←"
+                  ? setPin((value) => value.slice(0, -1))
+                  : key === "."
+                    ? undefined
+                    : setPin((value) => (value + key).slice(0, 4))
+              }
+              disabled={key === "."}
+              aria-label={
+                key === "←" ? "Удалить последний символ" : `Символ ${key}`
+              }
+            >
+              {key === "←" ? <IconBackspace className="size-7" /> : key}
+            </button>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-3 gap-1">
+          <button
+            type="button"
+            className="flex h-14 items-center justify-center border border-white/45 bg-white/10 text-white transition-colors hover:bg-white/18 active:bg-white/25"
+            onClick={() => setPin("")}
+            aria-label="Очистить PIN"
+          >
+            <IconEraser className="size-6" />
+          </button>
+          <Button
+            type="submit"
+            aria-label="Войти"
+            className="col-span-2 h-14 rounded-none border border-white/35 bg-success text-lg font-medium text-white hover:bg-success/90"
+          >
+            {loading ? "Вход…" : "Подтвердить"}
+            {loading ? <Spinner className="size-5" /> : null}
+          </Button>
+        </div>
+
+        <div
           className={cn(
             "overflow-hidden transition-all duration-300 ease-in-out",
-            error ? "max-h-16 opacity-100 mt-1" : "max-h-0 opacity-0 mt-0"
+            error ? "mt-1 max-h-16 opacity-100" : "mt-0 max-h-0 opacity-0"
           )}
         >
           <div
             className={cn(
-              "flex items-center gap-2 rounded-md border border-danger/30 bg-danger-subtle px-2 py-1 text-xs text-danger",
+              "flex items-center justify-center gap-2 border border-white/30 bg-danger px-3 py-2 text-center text-xs text-white",
               error && "animate-shake"
             )}
           >
-            <span className="leading-none">⚠️</span>
+            <span aria-hidden>⚠</span>
             <span className="leading-tight">{error}</span>
           </div>
         </div>
 
-        <Field>
-          <Button type="submit">
-            {loading ? "Вход..." : "Войти"}
-            {loading ? <Spinner className="size-6" /> : ""}
-          </Button>
-        </Field>
-        {/* <FieldSeparator>Или продолжить с помощью</FieldSeparator> */}
-        <Field>
-          {/* <Button variant="outline" type="button">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <path
-                d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"
-                fill="currentColor"
-              />
-            </svg>
-            Войти через GitHub
-          </Button> */}
-          <FieldDescription className="text-center">
-            Нет аккаунта?{" "}
-            <a href="/signup" className="underline underline-offset-4">
-              Создать
+        <div className="mt-2 flex items-center justify-center gap-4 text-xs text-white/65">
+          <a
+            href="/forgot-password"
+            className="hover:text-white hover:underline"
+          >
+            Забыли пароль?
+          </a>
+          <span aria-hidden>·</span>
+          <FieldDescription className="text-white/65">
+            <a href="/signup" className="hover:text-white hover:underline">
+              Создать аккаунт
             </a>
           </FieldDescription>
-        </Field>
+        </div>
       </FieldGroup>
     </form>
   )

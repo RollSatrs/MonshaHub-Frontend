@@ -1,6 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { api } from "@/lib/api"
-import type { CreateCashierInput, StaffMember } from "@/lib/api/types"
+import type {
+  CreateCashierInput,
+  StaffMember,
+  UpdateStaffInput,
+} from "@/lib/api/types"
 
 export const staffKey = ["staff"] as const
 
@@ -25,6 +29,20 @@ export function useSetStaffActive() {
   return useMutation({
     mutationFn: async ({ id, active }: { id: number; active: boolean }) =>
       (await api.patch<StaffMember>(`/staff/${id}`, { active })).data,
+    onSuccess: () => qc.invalidateQueries({ queryKey: staffKey }),
+  })
+}
+
+export function useUpdateStaff() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({
+      id,
+      input,
+    }: {
+      id: number
+      input: UpdateStaffInput
+    }) => (await api.patch<StaffMember>(`/staff/${id}`, input)).data,
     onSuccess: () => qc.invalidateQueries({ queryKey: staffKey }),
   })
 }

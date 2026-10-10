@@ -1,9 +1,16 @@
 import axios from "axios"
 import { env } from "@/lib/env"
+import { getActiveBranchId } from "@/lib/branch-context"
 
 export const api = axios.create({
   baseURL: env.NEXT_PUBLIC_API_URL,
   withCredentials: true,
+})
+
+api.interceptors.request.use((config) => {
+  const branchId = getActiveBranchId()
+  if (branchId) config.headers.set("x-branch-id", String(branchId))
+  return config
 })
 
 let sessionResetStarted = false

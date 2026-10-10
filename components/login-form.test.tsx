@@ -8,16 +8,16 @@ vi.mock("next/navigation", () => ({
 }))
 
 describe("LoginForm", () => {
-  it("показывает ошибку валидации и не отправляет запрос при коротком пароле", async () => {
+  it("показывает ошибку валидации и не отправляет запрос при неверном PIN", async () => {
     const user = userEvent.setup()
     render(<LoginForm />)
 
     await user.type(screen.getByLabelText("Email"), "user@example.com")
-    await user.type(screen.getByLabelText("Пароль"), "123")
+    await user.type(screen.getByLabelText("PIN-код"), "123")
     await user.click(screen.getByRole("button", { name: /войти/i }))
 
     expect(
-      await screen.findByText("Пароль должен содержать не менее 8 символов.")
+      await screen.findByText("PIN должен состоять из 4 цифр.")
     ).toBeInTheDocument()
   })
 })

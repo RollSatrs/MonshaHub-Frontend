@@ -20,6 +20,14 @@ import {
 import { Input } from "@/components/ui/input"
 import { getErrorMessage } from "@/lib/get-error-message"
 import { useCreateCashier } from "@/lib/queries/staff"
+import { useBranches } from "@/lib/queries/branches"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 export function CashierFormDialog({
   open,
@@ -29,27 +37,33 @@ export function CashierFormDialog({
   onOpenChange: (open: boolean) => void
 }) {
   const create = useCreateCashier()
+  const branches = useBranches()
   const [fullname, setFullname] = useState("")
   const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [pin, setPin] = useState("")
+  const [branchId, setBranchId] = useState("")
   const [error, setError] = useState("")
+
+  const selectedBranchId =
+    branchId || String(branches.data?.find((branch) => branch.active)?.id ?? "")
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
     setError("")
     if (!fullname.trim()) return setError("Укажите имя")
-    if (password.length < 8)
-      return setError("Пароль должен содержать не менее 8 символов")
+    if (!selectedBranchId) return setError("Выберите филиал")
+    if (!/^\d{4}$/.test(pin)) return setError("PIN должен состоять из 4 цифр")
     try {
       await create.mutateAsync({
         fullname: fullname.trim(),
         email: email.trim(),
-        password,
+        pin,
+        branchId: Number(selectedBranchId),
       })
       toast.success("Кассир добавлен")
       setFullname("")
       setEmail("")
-      setPassword("")
+      setPin("")
       onOpenChange(false)
     } catch (err) {
       setError(getErrorMessage(err, "Не удалось добавить кассира"))
@@ -63,7 +77,7 @@ export function CashierFormDialog({
           <DialogHeader>
             <DialogTitle>Новый кассир</DialogTitle>
             <DialogDescription>
-              Кассир войдёт по этому email и паролю.
+              Назначьте филиал и PIN для входа кассира на рабочем месте.
             </DialogDescription>
           </DialogHeader>
           <FieldGroup>
@@ -88,16 +102,36 @@ export function CashierFormDialog({
               />
             </Field>
             <Field>
-              <FieldLabel htmlFor="cashier-password">Пароль</FieldLabel>
+              <FieldLabel htmlFor="cashier-branch">Филиал</FieldLabel>
+              <Select value={selectedBranchId} onValueChange={setBranchId}>
+                <SelectTrigger id="cashier-branch" className="min-h-12 w-full">
+                  <SelectValue placeholder="Выберите филиал" />
+                </SelectTrigger>
+                <SelectContent>
+                  {branches.data
+                    ?.filter((branch) => branch.active)
+                    .map((branch) => (
+                      <SelectItem key={branch.id} value={String(branch.id)}>
+                        {branch.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="cashier-pin">PIN-код</FieldLabel>
               <Input
-                id="cashier-password"
-                type="password"
+                id="cashier-pin"
+                inputMode="numeric"
                 autoComplete="new-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={pin}
+                onChange={(e) =>
+                  setPin(e.target.value.replace(/\D/g, "").slice(0, 4))
+                }
+                maxLength={4}
                 required
               />
-              <FieldDescription>Не менее 8 символов.</FieldDescription>
+              <FieldDescription>Ровно 4 цифры.</FieldDescription>
             </Field>
           </FieldGroup>
           {error && (

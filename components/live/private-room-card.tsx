@@ -21,7 +21,7 @@ interface Props {
 }
 
 const cardBase =
-  "flex min-h-[156px] w-full flex-col gap-2 rounded-xl border p-4 text-left transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+  "flex min-h-[176px] w-full flex-col gap-3 rounded-xl border border-l-4 p-4 text-left shadow-[0_1px_3px_rgba(22,25,28,.08)] transition-[border-color,box-shadow,transform] hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(22,25,28,.10)] focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
 
 /** Карточка PRIVATE-помещения. Состояние приходит с backend; здесь только показ и локальный отсчёт. */
 export function PrivateRoomCard({
@@ -42,7 +42,9 @@ export function PrivateRoomCard({
         data-testid={`room-${room.id}`}
       >
         <div className="flex items-start justify-between gap-2">
-          <h2 className="text-lg font-semibold">{room.name}</h2>
+          <h2 className="text-base font-semibold text-foreground">
+            {room.name}
+          </h2>
           <StatePill state="CLEANING" />
         </div>
         <p className="text-muted-foreground flex items-center gap-1.5 text-sm">
@@ -77,13 +79,15 @@ export function PrivateRoomCard({
         aria-label={`${room.name}: ${room.state}`}
       >
         <div className="flex items-start justify-between gap-2">
-          <h2 className="text-lg font-semibold">{room.name}</h2>
+          <h2 className="text-base font-semibold text-foreground">
+            {room.name}
+          </h2>
           <StatePill state={room.state} />
         </div>
         {remaining !== null && (
           <p
             className={cn(
-              "font-mono text-4xl leading-none font-semibold tabular-nums",
+              "font-mono text-4xl leading-none font-semibold tracking-tight tabular-nums",
               room.state === "OVERTIME" && "text-danger",
               room.state === "ENDING_SOON" && "text-warning"
             )}
@@ -121,7 +125,7 @@ export function PrivateRoomCard({
       aria-label={`${room.name}: свободно, начать посещение`}
     >
       <div className="flex items-start justify-between gap-2">
-        <h2 className="text-lg font-semibold">{room.name}</h2>
+        <h2 className="text-base font-semibold text-foreground">{room.name}</h2>
         <StatePill state="AVAILABLE" />
       </div>
       {!room.hasTariff ? (

@@ -15,6 +15,7 @@ import { getErrorMessage } from "@/lib/get-error-message"
 import { formatMoney } from "@/lib/money"
 import { useBoard, useFinishCleaning } from "@/lib/queries/live"
 import { useStartPublicVisit } from "@/lib/queries/visits"
+import { cn } from "@/lib/utils"
 import type { LiveRoom } from "@/lib/api/types"
 
 /**
@@ -78,12 +79,36 @@ export function LiveBoard() {
     <>
       <PageHeader
         title="Баня сейчас"
-        description={
-          summary.length
-            ? summary.map(([label, n]) => `${label}: ${n}`).join(" · ")
-            : "Состояние помещений в реальном времени"
-        }
+        description="Состояние помещений и активных посещений в реальном времени"
       />
+
+      {summary.length > 0 && (
+        <div className="grid grid-cols-3 overflow-hidden rounded-xl border border-border bg-white shadow-sm sm:w-fit sm:min-w-[420px]">
+          <span className="sr-only">
+            {summary.map(([label, n]) => `${label}: ${n}`).join(" · ")}
+          </span>
+          {summary.map(([label, n], index) => (
+            <div
+              key={label}
+              className="flex min-h-14 items-center justify-between gap-4 border-r border-border px-3 last:border-r-0"
+            >
+              <span className="text-xs font-medium text-muted-foreground">
+                {label}
+              </span>
+              <strong
+                className={cn(
+                  "text-xl tabular-nums",
+                  index === 0 && "text-success",
+                  index === 1 && "text-primary",
+                  index === 2 && "text-muted-foreground"
+                )}
+              >
+                {n}
+              </strong>
+            </div>
+          ))}
+        </div>
+      )}
 
       {board.isPending ? (
         <LoadingRows rows={4} />
@@ -105,7 +130,7 @@ export function LiveBoard() {
               Пробуем снова…
             </p>
           )}
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {data.rooms.map((room) =>
               room.type === "PRIVATE" ? (
                 <PrivateRoomCard

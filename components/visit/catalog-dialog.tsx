@@ -48,7 +48,7 @@ export function CatalogDialog(props: Props) {
   const { open, onOpenChange, title } = props
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="border-t-4 border-t-primary sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
@@ -136,8 +136,8 @@ function CatalogBody({
                 setError("")
               }}
               className={cn(
-                "relative flex min-h-24 flex-col items-start justify-between rounded-xl border p-3 text-left transition-colors",
-                "hover:border-primary hover:bg-primary-subtle focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+                "relative flex min-h-24 flex-col items-start justify-between rounded-lg border border-border bg-card p-3 text-left shadow-sm transition-[border-color,background-color,transform]",
+                "hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary-subtle/45 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
                 "disabled:cursor-not-allowed disabled:opacity-50",
                 (busyId === e.id || selectedId === e.id) &&
                   "border-primary bg-primary-subtle"
@@ -170,7 +170,7 @@ function CatalogBody({
       {selected && (
         <form
           onSubmit={submit}
-          className="bg-secondary/60 flex flex-wrap items-end gap-3 rounded-xl p-3"
+          className="flex flex-wrap items-end gap-3 rounded-lg border border-border bg-secondary/60 p-3"
         >
           <div className="min-w-0 flex-1">
             <p className="truncate font-medium">{selected.name}</p>

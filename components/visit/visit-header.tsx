@@ -27,7 +27,7 @@ export function VisitHeader({ visit, timezone, nowMs }: Props) {
   return (
     <Card
       className={cn(
-        "gap-3 p-5",
+        "gap-3 border-t-[3px] border-t-primary p-5",
         overtime && "border-danger/40 bg-danger-subtle"
       )}
     >
@@ -36,7 +36,7 @@ export function VisitHeader({ visit, timezone, nowMs }: Props) {
           <p className="text-muted-foreground text-sm">
             Посещение №{visit.id} · {ROOM_TYPE_LABEL[visit.kind]}
           </p>
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
             {visit.roomName}
           </h1>
           <p className="mt-1 text-sm">
@@ -68,7 +68,7 @@ export function VisitHeader({ visit, timezone, nowMs }: Props) {
             <Badge
               variant="secondary"
               className={cn(
-                "rounded-full",
+                "rounded-[2px]",
                 visit.status === "COMPLETED" && "text-success",
                 visit.status === "CANCELLED" && "text-danger bg-danger-subtle"
               )}
